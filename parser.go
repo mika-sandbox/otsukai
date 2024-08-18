@@ -4,157 +4,161 @@ import (
 	"errors"
 	"github.com/alecthomas/participle/v2"
 	"github.com/alecthomas/participle/v2/lexer"
+	"regexp"
 	"slices"
 )
 
 type (
-	Boolean                  bool
-	WithoutKeywordIdentifier struct {
-		Identifier string `parse:"@Identifier"`
+	Identifier struct {
+		Name string `parser:"@Identifier"`
 	}
 
-	// identifier:
-	HashIdentifier struct {
-		Identifier   string   `parser:"@Identifier"`
-		ColonKeyword struct{} `parser:"':'"`
-	}
-
-	// :keyword
-	HashKeyword struct {
-		ColonKeyword struct{} `parser:"':'"`
-		Identifier   string   `parser:"@Identifier"`
-	}
-
-	// { object: any_value ... }
-	HashObject struct {
-		OpenBracket  struct{}          `parser:"'{'"`
-		Hashes       []*HashExpression `parser:"@@ (',' @@)*"`
-		CloseBracket struct{}          `parser:"'}'"`
-	}
-
-	// any values
-	Literal struct {
-		Number  *float64 `parser:"@Number |"`
-		String  *string  `parser:"@String |"`
-		Boolean *Boolean `parser:"@('true' | 'false') |"`
-		Null    bool     `parser:"'nil'"`
-	}
-
-	Value struct {
-		Literal *Literal     `parser:"@@ |"`
-		Keyword *HashKeyword `parser:"@@ |"`
-		Object  *HashObject  `parser:"@@"`
-	}
-
-	Expression struct {
-		Literal                         *Value                           `parser:"@@ |"`
-		Hash                            *HashExpression                  `parser:"@@ |"`
-		Keyword                         *string                          `parser:"@HashKeyword |"`
-		InvocationWithoutArgsExpression *InvocationWithoutArgsExpression `parser:"@@ |"`
-		InvocationWithArgsExpression    *InvocationWithArgsExpression    `parser:"@@"`
-	}
-
-	DoExpressionWithoutStatements struct {
-		DoKeyword  struct{} `parser:"'do'"`
-		EndKeyword struct{} `parser:"'end'"`
-	}
-
-	// do ... end
-	DoExpressionWithStatements struct {
-		DoKeyword  struct{}    `parser:"'do'"`
-		Statements []Statement `parser:"@@*"`
-		EndKeyword struct{}    `parser:"'end'"`
-	}
-
-	DoExpression struct {
-		WithoutStatements *DoExpressionWithoutStatements `parser:"@@ |"`
-		WithStatements    *DoExpressionWithStatements    `parser:"@@"`
-	}
-
-	// method(...)
-	// method ...
-	// method ... do ... end
-	InvocationWithArgsExpression struct {
-		Identifier       WithoutKeywordIdentifier `parser:"@@"`
-		OpenParen        *struct{}                `parser:"'('?"`
-		Arguments        []Expression             `parser:"@@ (',' @@)*"`
-		CloseParen       *struct{}                `parser:"')'?"`
-		LambdaExpression *DoExpression            `parser:"@@?"`
-	}
-
-	// method()
-	// method
-	// method do ... end
-	InvocationWithoutArgsExpression struct {
-		Identifier       WithoutKeywordIdentifier `parser:"@@"`
-		OpenParen        struct{}                 `parser:"'('"`
-		CloseParen       struct{}                 `parser:"')'"`
-		LambdaExpression *DoExpression            `parser:"@@?"`
-	}
-
-	// hash: ...
-	HashExpression struct {
+	Pair struct {
 		Identifier HashIdentifier `parser:"@@"`
 		Value      Value          `parser:"@@"`
 	}
 
-	// set key: xxx
-	SetStatement struct {
-		SetKeyword struct{}       `parser:"'set'"`
-		Expression HashExpression `parser:"@@"`
+	Literal struct {
+		String  *string  `parser:"@String  |"`
+		Number  *float64 `parser:"@Number  |"`
+		Boolean *bool    `parser:"('true' | 'false') |"`
+		Null    bool     `parser:"'nil'"`
 	}
 
-	// task :identifier do ... end
-	TaskStatement struct {
-		TaskKeyword struct{}     `parser:"'task'"`
-		Identifier  HashKeyword  `parser:"@@"`
-		DoStatement DoExpression `parser:"@@"`
+	HashIdentifier struct {
+		Identifier string `parser:"@Identifier ':'"`
 	}
 
-	// hook after: :identifier do ... end
-	HookStatement struct {
-		HookKeyword struct{}       `parser:"'hook'"`
-		Parameters  HashExpression `parser:"@@"`
-		DoStatement DoExpression   `parser:"@@"`
+	HashSymbol struct {
+		Identifier string `parser:"':' @Identifier"`
 	}
 
-	// statement
+	HashObject struct {
+		OpenBracket  string `parser:"'{'"`
+		Pairs        []Pair `parser:"@@ (',' @@)+"`
+		CloseBracket string `parser:"'}'"`
+	}
+
+	Value struct {
+		Literal    *Literal    `parser:"@@ |"`
+		HashSymbol *HashSymbol `parser:"@@ |"`
+		Hash       *HashObject `parser:"@@"`
+	}
+
+	IdentifierNameExpression struct {
+		Identifier Identifier `parser:"@@"`
+	}
+
+	MemberAccessExpressionTExpression struct {
+		MemberAccessExpression *MemberAccessExpression        `parser:"@@ |"`
+		InvocationExpression   *InvocationExpressionWithParen `parser:"@@"`
+	}
+
+	MemberAccessExpression struct {
+		Expression MemberAccessExpressionTExpression `parser:"@@"`
+		Dot        string                            `parser:"'.'"`
+		Identifier Identifier                        `parser:"@@"`
+	}
+
+	LambdaExpression struct {
+		DoKeyword  string      `parser:"'do'"`
+		NewLine    string      `parser:"@NewLine?"`
+		Statements []Statement `parser:"@@*"`
+		EndKeyword string      `parser:"'end'"`
+	}
+
+	Argument struct {
+		Identifier *string    `parser:"(@Identifier ':')?"`
+		Expression Expression `parser:"@@"`
+	}
+
+	ArgumentList struct {
+		Argument         []Argument        `parser:"(@@ (',' @@)*)?"`
+		LambdaExpression *LambdaExpression `parser:"@@?"`
+	}
+
+	InvocationExpression struct {
+		Expression   ExpressionWithIdentifier `parser:"@@"`
+		ArgumentList ArgumentList             `parser:"@@"`
+	}
+
+	InvocationExpressionWithParen struct {
+		Expression   ExpressionWithIdentifier `parser:"@@"`
+		OpenParen    string                   `parser:"'('"`
+		ArgumentList ArgumentList             `parser:"@@"`
+		CloseParen   string                   `parser:"')'"`
+	}
+
+	ValueExpression struct {
+		Value Value `parser:"@@"`
+	}
+
+	ExpressionWithIdentifier struct {
+		IdentifierNameExpression *IdentifierNameExpression `parser:"@@"`
+		// Expression               *Expression               `parser:"@@"`
+	}
+
+	Expression struct {
+		// MemberAccessExpression        *MemberAccessExpression        `parser:"@@ |"`
+		LambdaExpression              *LambdaExpression              `parser:"@@ |"`
+		InvocationExpression          *InvocationExpression          `parser:"@@ |"`
+		InvocationExpressionWithParen *InvocationExpressionWithParen `parser:"@@ |"`
+		IfExpression                  *IfStatementOrExpression       `parser:"@@ |"`
+		ValueExpression               *ValueExpression               `parser:"@@"`
+	}
+
+	BlockStatement struct {
+		OpenBracket  string      `parser:"'{'"`
+		Statements   []Statement `parser:"@@"`
+		CloseBracket string      `parser:"'}'"`
+	}
+
+	IfStatementOrExpressionConditionExpression struct {
+		InvocationExpression          *InvocationExpression          `parser:"@@ |"`
+		InvocationExpressionWithParen *InvocationExpressionWithParen `parser:"@@ |"`
+		ValueExpression               *ValueExpression               `parser:"@@"`
+	}
+
+	IfStatementOrExpression struct {
+		IfKeyword  string                                     `parser:"'if'"`
+		OpenParen  *string                                    `parser:"'('?"`
+		Condition  IfStatementOrExpressionConditionExpression `parser:"@@"`
+		CloseParen *string                                    `parser:"')'?"`
+		NewParen   *string                                    `parser:"@NewLine?"`
+		Statements []Statement                                `parser:"@@*"`
+		EndKeyword string                                     `parser:"'end'"`
+	}
+
 	ExpressionStatement struct {
-		DoExpression                    *DoExpression                    `parser:"@@ |"`
-		InvocationWithoutArgsExpression *InvocationWithoutArgsExpression `parser:"@@ |"`
-		InvocationWithArgsExpression    *InvocationWithArgsExpression    `parser:"@@"`
+		Expression Expression `parser:"@@"`
 	}
 
-	// if cond ... end
-	IfStatement struct {
-		IfKeyword  struct{}    `parser:"'if'"`
-		OpenParen  *struct{}   `parser:"'('?"`
-		Condition  Expression  `parser:"@@"`
-		CloseParen *struct{}   `parser:"')'?"`
-		Statements []Statement `parser:"@@"`
-		EndKeyword struct{}    `parser:"'end'"`
+	StatementInternal struct {
+		BlockStatement      *BlockStatement          `parser:"@@ |"`
+		IfStatement         *IfStatementOrExpression `parser:"@@ |"`
+		ExpressionStatement *ExpressionStatement     `parser:"@@"`
 	}
 
-	// any statement
 	Statement struct {
-		SetStatement        *SetStatement        `parser:"@@ |"`
-		TaskStatement       *TaskStatement       `parser:"@@ |"`
-		HookStatement       *HookStatement       `parser:"@@ |"`
-		IfStatement         *IfStatement         `parser:"@@ |"`
-		ExpressionStatement *ExpressionStatement `parser:"@@ "`
+		Statement StatementInternal `parser:"@@"`
+		NewLine   string            `parser:"@NewLine"`
+	}
+
+	CompilationUnit struct {
+		Statements []Statement `parser:"@@*"`
 	}
 )
 
 func (v Value) ToValueObject() (IValueObject, error) {
-	if v.Keyword != nil {
-		return &StringValueObject{val: v.Keyword.Identifier}, nil
-	}
+	// if v.Keyword != nil {
+	// 	return &StringValueObject{val: v.Keyword.Identifier}, nil
+	// }
 
-	if v.Object != nil {
+	if v.Hash != nil {
 		items := map[string]IValueObject{}
 
-		for _, hash := range v.Object.Hashes {
-			items[hash.Identifier.Identifier], _ = hash.Value.ToValueObject()
+		for _, pair := range v.Hash.Pairs {
+			items[pair.Identifier.Identifier], _ = pair.Value.ToValueObject()
 		}
 
 		return &HashValueObject{val: items}, nil
@@ -198,7 +202,8 @@ var RubyLikeLexer = lexer.MustSimple([]lexer.SimpleRule{
 	{`String`, `'[^']*'|"[^"]*"`},
 	{"Number", `(?:\d*\.)?\d+`},
 	{"Comment", `#.*(\n)?`},
-	{"Whitespace", `[ \t\n\r]+`},
+	{"Whitespace", `[ \t]+`},
+	{"NewLine", `[\r\n]+`},
 
 	// indirect references for lexer
 	{"COLON", ":"},
@@ -212,7 +217,6 @@ var RubyLikeLexer = lexer.MustSimple([]lexer.SimpleRule{
 var Parser = participle.MustBuild[Entry](
 	participle.Lexer(RubyLikeLexer),
 	participle.Elide("Comment", "Whitespace"),
-	participle.Unquote("String"),
 	participle.UseLookahead(2),
 )
 
@@ -222,7 +226,7 @@ var Keywords = []string{
 	"end",
 }
 
-func (v *WithoutKeywordIdentifier) Parse(lex *lexer.PeekingLexer) error {
+func (v *Identifier) Parse(lex *lexer.PeekingLexer) error {
 	token := lex.Peek()
 
 	if token.EOF() {
@@ -233,13 +237,23 @@ func (v *WithoutKeywordIdentifier) Parse(lex *lexer.PeekingLexer) error {
 		return participle.NextMatch
 	}
 
+	identifier, err := regexp.Compile(`^[A-Za-z_][A-Za-z0-9_]*$`)
+	if err != nil {
+		return err
+	}
+
+	matches := identifier.FindAllString(token.Value, -1)
+	if len(matches) != 1 {
+		return participle.NextMatch
+	}
+
 	next := lex.Next()
 	if next.EOF() {
 		return errors.New("unexpected eof")
 	}
 
-	*v = WithoutKeywordIdentifier{
-		Identifier: next.Value,
+	*v = Identifier{
+		Name: next.Value,
 	}
 
 	return nil

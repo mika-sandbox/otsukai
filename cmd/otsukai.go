@@ -16,7 +16,7 @@ func run(c *cli.Context) error {
 		return err
 	}
 
-	ruby, err := otsukai.Parser.ParseString("", string(content))
+	ruby, err := otsukai.Parser.ParseString("", string(content)+"\n")
 	if err != nil {
 		fmt.Println(err)
 		return err

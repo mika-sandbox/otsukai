@@ -4,7 +4,7 @@ set default: :deploy
 set target: { host: "yuuka.natsuneko.net", user: "ubuntu" }
 
 task :deploy do
-  if changed("/path/to/docker-compose.yml", from: :last_commit)
+  if changed "/path/to/docker-compose.yml", from: :last_commit
     # run as sudo
     run_as :sudo do
       # run docker compose down on remote
@@ -21,7 +21,7 @@ task :deploy do
 end
 
 hook after: :deploy do
-  if task_success()
+  if task_success
     echo "Deploy Successful"
   end
 end
