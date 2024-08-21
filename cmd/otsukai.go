@@ -10,6 +10,7 @@ import (
 
 func run(c *cli.Context) error {
 	recipe := c.String("recipe")
+
 	content, err := os.ReadFile(recipe)
 	if err != nil {
 		log.Fatal(err)
@@ -33,19 +34,21 @@ func run(c *cli.Context) error {
 
 func test(c *cli.Context) error {
 	recipe := c.String("recipe")
+	otsukai.Info("check syntax for %s", recipe)
+
 	content, err := os.ReadFile(recipe)
 	if err != nil {
 		log.Fatal(err)
 		return err
 	}
 
-	_, err = otsukai.Parser.ParseString("", string(content))
+	_, err = otsukai.Parser.ParseString("", string(content)+"\n")
 	if err != nil {
-		fmt.Println(err)
+		otsukai.Err("&s", err)
 		return err
 	}
 
-	fmt.Println("syntax ok")
+	otsukai.Success("check syntax for %s is success", recipe)
 	return nil
 }
 

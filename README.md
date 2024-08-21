@@ -57,6 +57,35 @@ $ otsukai deploy --recipe examples/docker-compose/otsukai.rb
 $ otsukai deploy --recipe examples/docker-compose/otsukai.rb --dry-run
 ```
 
+## Functions
+
+### `set`
+
+Set a variable value. Example:
+
+```ruby
+set target: { host: "yuuka.natsuneko.net", user: "ubuntu" }
+set default: :deploy
+set app_root: "/usr/local/"
+```
+
+### `task`
+
+Define a task with name. Example:
+
+```ruby
+# define `deploy` task
+task :deploy do 
+  # ...
+end
+
+# define `rollback` task
+task :rollback do 
+  # ...
+end
+```
+
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

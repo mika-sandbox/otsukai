@@ -150,9 +150,9 @@ type (
 )
 
 func (v Value) ToValueObject() (IValueObject, error) {
-	// if v.Keyword != nil {
-	// 	return &StringValueObject{val: v.Keyword.Identifier}, nil
-	// }
+	if v.HashSymbol != nil {
+		return &StringValueObject{val: v.HashSymbol.Identifier}, nil
+	}
 
 	if v.Hash != nil {
 		items := map[string]IValueObject{}

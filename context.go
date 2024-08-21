@@ -1,5 +1,7 @@
 package otsukai
 
+import "errors"
+
 type IContext interface {
 	SetVar(name string, value IValueObject)
 	GetStatements() []Statement
@@ -25,12 +27,19 @@ type Context struct {
 	Variables  map[string]IValueObject
 }
 
-func (ctx Context) SetVar(name string, value IValueObject) {
+func (ctx *Context) SetVar(name string, value IValueObject) {
 	ctx.Variables[name] = value
 }
 
-func (ctx Context) GetStatements() []Statement {
+func (ctx *Context) GetStatements() []Statement {
 	return ctx.Statements
+}
+
+func (ctx *Context) CreateScope(statements []Statement) ScopedContext {
+	return ScopedContext{
+		Statements: statements,
+		Variables:  ctx.Variables,
+	}
 }
 
 func NewContext(ruby *Entry) Context {
@@ -40,101 +49,67 @@ func NewContext(ruby *Entry) Context {
 	}
 }
 
+func (ctx *Context) invoke(invocation *InvocationExpression) (IValueObject, error) {
+	identifier := invocation.Expression.IdentifierNameExpression.Identifier.Name
+	arguments := invocation.ArgumentList.Argument
+	// lambda := invocation.ArgumentList.LambdaExpression
+
+	switch identifier {
+	case "set":
+		if len(arguments) != 1 {
+			Err("set method must be one argument")
+			return nil, errors.New("set method must be one argument")
+		}
+
+		name := arguments[0].Identifier
+		if name == nil {
+			Err("set must be named arguments")
+			return nil, errors.New("set must be named arguments")
+		}
+
+		value, err := arguments[0].Expression.ValueExpression.Value.ToValueObject()
+		if err != nil {
+			return nil, err
+		}
+
+		ctx.SetVar(*name, value)
+		return nil, nil
+
+	case "task":
+		break
+
+	case "hook":
+		break
+	}
+
+	Err("the function `%v` is not declared in context", identifier)
+	return nil, errors.New("the function is not declare in context")
+}
+
 func (ctx *Context) Run() error {
 	var err error
 	// set default values
 	ctx.Variables["default"] = &StringValueObject{val: "deploy"}
 
-	// evaluate set in global scope
-	err = runDeclarations(ctx)
-	if err != nil {
-		return err
-	}
+	for _, statement := range ctx.GetStatements() {
+		s := statement.Statement
 
-	// evaluate task declarations
-	tasks, err := runTaskDeclarations(ctx)
-	if err != nil {
-		return err
-	}
-
-	err = assignHookDeclarations(ctx, tasks)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func runDeclarations(ctx IContext) error {
-	/*
-		for _, statement := range ctx.GetStatements() {
-			if statement.SetStatement == nil {
-				continue
-			}
-
-			err := set(ctx, statement.SetStatement)
-			if err != nil {
-				return err
-			}
+		if s.IfStatement != nil || s.BlockStatement != nil {
+			Err("invalid statement: if or block statement could not placed in the compilation block")
+			return errors.New("invalid statement: if or block statement could not placed in the compilation block")
 		}
-	*/
 
-	return nil
-}
-
-func runTaskDeclarations(ctx *Context) ([]Task, error) {
-	/*
-		var tasks []Task
-
-		for _, statement := range ctx.GetStatements() {
-			if statement.TaskStatement == nil {
-				continue
-			}
-
-			task := statement.TaskStatement
-			tasks = append(tasks, Task{
-				Name:        task.Identifier.Identifier,
-				Statements:  task.DoStatement.WithStatements.Statements,
-				BeforeHooks: []Hook{},
-				AfterHooks:  []Hook{},
-			})
+		expression := s.ExpressionStatement.Expression
+		if expression.IfExpression != nil || expression.ValueExpression != nil || expression.LambdaExpression != nil {
+			Err("invalid statement: if expression, lambda expression or value could not placed in the compilation block")
+			return errors.New("invalid statement: if expression, lambda expression or value could not placed in the compilation block")
 		}
-	*/
 
-	return []Task{}, nil
-}
-
-func assignHookDeclarations(ctx *Context, tasks []Task) error {
-	/*
-		for _, statement := range ctx.GetStatements() {
-			if statement.HookStatement == nil {
-				continue
-			}
-
-			hook := statement.HookStatement
-			event := hook.Parameters.Identifier.Identifier
-			value, err := hook.Parameters.Value.ToValueObject()
-			if err != nil {
-				return err
-			}
-			on, err := value.ToString()
-			if err != nil {
-				return err // must be string
-			}
-
-			idx := slices.IndexFunc(tasks, func(t Task) bool { return t.Name == *on })
-			task := &tasks[idx]
-
-			if event == "before" {
-				task.BeforeHooks = append(task.BeforeHooks, Hook{Statements: hook.DoStatement.WithStatements.Statements})
-			} else if event == "after" {
-				task.AfterHooks = append(task.AfterHooks, Hook{Statements: hook.DoStatement.WithStatements.Statements})
-			} else {
-				return errors.New("unknown hook")
-			}
-
+		_, err = ctx.invoke(expression.InvocationExpression)
+		if err != nil {
+			return err
 		}
-	*/
+	}
 
 	return nil
 }
