@@ -1,5 +1,3 @@
-set default: :deploy
-
 # default target host with user (ubuntu@yuuka.natsuneko.net)
 set target: { host: "yuuka.natsuneko.net", user: "ubuntu" }
 

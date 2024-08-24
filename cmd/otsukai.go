@@ -34,21 +34,21 @@ func run(c *cli.Context) error {
 
 func test(c *cli.Context) error {
 	recipe := c.String("recipe")
-	otsukai.Info("check syntax for %s", recipe)
+	otsukai.Infof("check syntax for %s", recipe)
 
 	content, err := os.ReadFile(recipe)
 	if err != nil {
-		log.Fatal(err)
+		otsukai.Fatalf("failed to read recipe: %s", err.Error())
 		return err
 	}
 
 	_, err = otsukai.Parser.ParseString("", string(content)+"\n")
 	if err != nil {
-		otsukai.Err("&s", err)
+		otsukai.Errf("check syntas for %s is failed: %s", recipe, err.Error())
 		return err
 	}
 
-	otsukai.Success("check syntax for %s is success", recipe)
+	otsukai.Successf("check syntax for %s is success", recipe)
 	return nil
 }
 

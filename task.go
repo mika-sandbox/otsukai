@@ -10,3 +10,18 @@ type Task struct {
 type Hook struct {
 	Statements []Statement
 }
+
+func CreateTask(name string, statements []Statement) Task {
+	return Task{
+		Name:        name,
+		Statements:  statements,
+		BeforeHooks: make([]Hook, 0),
+		AfterHooks:  make([]Hook, 0),
+	}
+}
+
+func CreateHook(statements []Statement) Hook {
+	return Hook{
+		Statements: statements,
+	}
+}
