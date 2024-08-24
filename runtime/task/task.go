@@ -1,17 +1,19 @@
-package otsukai
+package task
+
+import "otsukai/parser"
 
 type Task struct {
 	Name        string
-	Statements  []Statement
+	Statements  []parser.Statement
 	BeforeHooks []Hook
 	AfterHooks  []Hook
 }
 
 type Hook struct {
-	Statements []Statement
+	Statements []parser.Statement
 }
 
-func CreateTask(name string, statements []Statement) Task {
+func CreateTask(name string, statements []parser.Statement) Task {
 	return Task{
 		Name:        name,
 		Statements:  statements,
@@ -20,7 +22,7 @@ func CreateTask(name string, statements []Statement) Task {
 	}
 }
 
-func CreateHook(statements []Statement) Hook {
+func CreateHook(statements []parser.Statement) Hook {
 	return Hook{
 		Statements: statements,
 	}

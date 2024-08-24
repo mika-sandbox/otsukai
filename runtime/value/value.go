@@ -1,6 +1,9 @@
-package otsukai
+package value
 
-import "errors"
+import (
+	"otsukai/parser"
+	re "otsukai/runtime/errors"
+)
 
 const (
 	VALUE_INT64 = iota
@@ -9,8 +12,6 @@ const (
 	VALUE_BOOLEAN
 	VALUE_HASH_OBJECT
 )
-
-var CAST_ERROR = errors.New("failed to cast value")
 
 type IValueObject interface {
 	Type() int
@@ -34,19 +35,19 @@ func (i *Int64ValueObject) ToInt64() (*int64, error) {
 }
 
 func (i *Int64ValueObject) ToFloat64() (*float64, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *Int64ValueObject) ToString() (*string, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *Int64ValueObject) ToBoolean() (*bool, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *Int64ValueObject) ToHashObject() (map[string]IValueObject, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 var _ IValueObject = (*Int64ValueObject)(nil)
@@ -62,7 +63,7 @@ func (i *Float64ValueObject) Type() int {
 }
 
 func (i *Float64ValueObject) ToInt64() (*int64, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *Float64ValueObject) ToFloat64() (*float64, error) {
@@ -71,15 +72,15 @@ func (i *Float64ValueObject) ToFloat64() (*float64, error) {
 }
 
 func (i *Float64ValueObject) ToString() (*string, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *Float64ValueObject) ToBoolean() (*bool, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *Float64ValueObject) ToHashObject() (map[string]IValueObject, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 var _ IValueObject = (*Float64ValueObject)(nil)
@@ -87,7 +88,7 @@ var _ IValueObject = (*Float64ValueObject)(nil)
 //
 
 type StringValueObject struct {
-	val string
+	Val string
 }
 
 func (i *StringValueObject) Type() int {
@@ -95,23 +96,23 @@ func (i *StringValueObject) Type() int {
 }
 
 func (i *StringValueObject) ToInt64() (*int64, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *StringValueObject) ToFloat64() (*float64, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *StringValueObject) ToString() (*string, error) {
-	return &i.val, nil
+	return &i.Val, nil
 }
 
 func (i *StringValueObject) ToBoolean() (*bool, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *StringValueObject) ToHashObject() (map[string]IValueObject, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 var _ IValueObject = (*StringValueObject)(nil)
@@ -127,15 +128,15 @@ func (i *BooleanValueObject) Type() int {
 }
 
 func (i *BooleanValueObject) ToInt64() (*int64, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *BooleanValueObject) ToFloat64() (*float64, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *BooleanValueObject) ToString() (*string, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *BooleanValueObject) ToBoolean() (*bool, error) {
@@ -143,7 +144,7 @@ func (i *BooleanValueObject) ToBoolean() (*bool, error) {
 }
 
 func (i *BooleanValueObject) ToHashObject() (map[string]IValueObject, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 var _ IValueObject = (*BooleanValueObject)(nil)
@@ -159,19 +160,19 @@ func (i *HashValueObject) Type() int {
 }
 
 func (i *HashValueObject) ToInt64() (*int64, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *HashValueObject) ToFloat64() (*float64, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *HashValueObject) ToString() (*string, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *HashValueObject) ToBoolean() (*bool, error) {
-	return nil, CAST_ERROR
+	return nil, re.CAST_ERROR
 }
 
 func (i *HashValueObject) ToHashObject() (map[string]IValueObject, error) {
@@ -179,3 +180,39 @@ func (i *HashValueObject) ToHashObject() (map[string]IValueObject, error) {
 }
 
 var _ IValueObject = (*HashValueObject)(nil)
+
+func ToValueObject(v parser.Value) (IValueObject, error) {
+	if v.HashSymbol != nil {
+		return &StringValueObject{Val: v.HashSymbol.Identifier}, nil
+	}
+
+	if v.Hash != nil {
+		items := map[string]IValueObject{}
+
+		for _, pair := range v.Hash.Pairs {
+			items[pair.Identifier.Identifier], _ = ToValueObject(pair.Value)
+		}
+
+		return &HashValueObject{val: items}, nil
+	}
+
+	if v.Literal != nil {
+		if v.Literal.String != nil {
+			return &StringValueObject{Val: *v.Literal.String}, nil
+		}
+
+		if v.Literal.Number != nil {
+			return &Float64ValueObject{val: *v.Literal.Number}, nil
+		}
+
+		if v.Literal.Boolean != nil {
+			return &BooleanValueObject{val: *v.Literal.Boolean == true}, nil
+		}
+
+		if v.Literal.Null {
+			return nil, nil
+		}
+	}
+
+	return nil, re.RUNTIME_ERROR
+}

@@ -6,6 +6,9 @@ import (
 	"log"
 	"os"
 	"otsukai"
+	"otsukai/parser"
+	"otsukai/runtime"
+	"otsukai/runtime/context"
 )
 
 func run(c *cli.Context) error {
@@ -17,14 +20,14 @@ func run(c *cli.Context) error {
 		return err
 	}
 
-	ruby, err := otsukai.Parser.ParseString("", string(content)+"\n")
+	ruby, err := parser.Parser.ParseString("", string(content)+"\n")
 	if err != nil {
 		fmt.Println(err)
 		return err
 	}
 
-	ctx := otsukai.NewContext(ruby)
-	if err := ctx.Run(); err != nil {
+	ctx := context.NewContext(ruby)
+	if err := runtime.Run(ctx); err != nil {
 		log.Fatal(err)
 		return err
 	}
@@ -42,7 +45,7 @@ func test(c *cli.Context) error {
 		return err
 	}
 
-	_, err = otsukai.Parser.ParseString("", string(content)+"\n")
+	_, err = parser.Parser.ParseString("", string(content)+"\n")
 	if err != nil {
 		otsukai.Errf("check syntas for %s is failed: %s", recipe, err.Error())
 		return err

@@ -32,5 +32,5 @@ func Errf(msg string, extras ...any) {
 }
 
 func Fatalf(msg string, extras ...any) {
-	fmt.Printf("%s %s\n", bgRed(HEADER_STR+"[FATAL]   "), fmt.Sprintf(msg, extras))
+	fmt.Printf("%s %s\n", bgRed(HEADER_STR+"[FATAL]   "), fmt.Sprintf(msg, extras...))
 }

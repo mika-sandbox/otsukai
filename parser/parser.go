@@ -1,4 +1,4 @@
-package otsukai
+package parser
 
 import (
 	"errors"
@@ -149,51 +149,9 @@ type (
 	}
 )
 
-func (v Value) ToValueObject() (IValueObject, error) {
-	if v.HashSymbol != nil {
-		return &StringValueObject{val: v.HashSymbol.Identifier}, nil
-	}
-
-	if v.Hash != nil {
-		items := map[string]IValueObject{}
-
-		for _, pair := range v.Hash.Pairs {
-			items[pair.Identifier.Identifier], _ = pair.Value.ToValueObject()
-		}
-
-		return &HashValueObject{val: items}, nil
-	}
-
-	if v.Literal != nil {
-		if v.Literal.String != nil {
-			return &StringValueObject{val: *v.Literal.String}, nil
-		}
-
-		if v.Literal.Number != nil {
-			return &Float64ValueObject{val: *v.Literal.Number}, nil
-		}
-
-		if v.Literal.Boolean != nil {
-			return &BooleanValueObject{val: *v.Literal.Boolean == true}, nil
-		}
-
-		if v.Literal.Null {
-			return nil, nil
-		}
-	}
-
-	return nil, errors.New("invalid value")
-}
-
 type Entry struct {
 	Statements []Statement `parser:"@@*"`
 }
-
-const (
-	KIND_SET_STATEMENT = iota
-	KIND_TASK_STATEMENT
-	KIND_IF_STATEMENT
-)
 
 var RubyLikeLexer = lexer.MustSimple([]lexer.SimpleRule{
 	{"Identifier", `[A-Za-z_][A-Za-z0-9_]*`},

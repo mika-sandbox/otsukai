@@ -1,8 +1,9 @@
-package otsukai
+package parser
 
 import (
 	require "github.com/alecthomas/assert/v2"
 	"os"
+	"otsukai/runtime"
 	"testing"
 )
 
@@ -48,7 +49,7 @@ func TestExample_DockerCompose(t *testing.T) {
 
 		arg := args[0]
 		key := *arg.Identifier
-		value, _ := arg.Expression.ValueExpression.Value.ToValueObject()
+		value, _ := runtime.ToValueObject(arg.Expression.ValueExpression.Value)
 		require.Equal(t, "target", key)
 
 		object, _ := value.ToHashObject()
