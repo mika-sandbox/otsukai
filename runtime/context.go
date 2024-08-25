@@ -1,10 +1,10 @@
 package runtime
 
 import (
-	"errors"
 	"otsukai"
 	"otsukai/parser"
 	"otsukai/runtime/context"
+	re "otsukai/runtime/errors"
 	"otsukai/runtime/value"
 )
 
@@ -140,8 +140,11 @@ func InvokeFunction(ctx context.IContext, identifier string, arguments []parser.
 
 	case "hook":
 		return CollectHook(ctx, arguments, lambda)
+
+	case "changed":
+		return InvokeChanged(ctx, arguments)
 	}
 
 	otsukai.Errf("the function `%v` is not declared in context", identifier)
-	return nil, errors.New("the function is not declare in context")
+	return nil, re.RUNTIME_ERROR
 }

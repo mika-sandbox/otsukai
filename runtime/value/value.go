@@ -23,30 +23,30 @@ type IValueObject interface {
 }
 
 type Int64ValueObject struct {
-	val int64
+	Val int64
 }
 
-func (i *Int64ValueObject) Type() int {
+func (i Int64ValueObject) Type() int {
 	return VALUE_INT64
 }
 
-func (i *Int64ValueObject) ToInt64() (*int64, error) {
-	return &i.val, nil
+func (i Int64ValueObject) ToInt64() (*int64, error) {
+	return &i.Val, nil
 }
 
-func (i *Int64ValueObject) ToFloat64() (*float64, error) {
+func (i Int64ValueObject) ToFloat64() (*float64, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *Int64ValueObject) ToString() (*string, error) {
+func (i Int64ValueObject) ToString() (*string, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *Int64ValueObject) ToBoolean() (*bool, error) {
+func (i Int64ValueObject) ToBoolean() (*bool, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *Int64ValueObject) ToHashObject() (map[string]IValueObject, error) {
+func (i Int64ValueObject) ToHashObject() (map[string]IValueObject, error) {
 	return nil, re.CAST_ERROR
 }
 
@@ -55,31 +55,31 @@ var _ IValueObject = (*Int64ValueObject)(nil)
 //
 
 type Float64ValueObject struct {
-	val float64
+	Val float64
 }
 
-func (i *Float64ValueObject) Type() int {
+func (i Float64ValueObject) Type() int {
 	return VALUE_FLOAT64
 }
 
-func (i *Float64ValueObject) ToInt64() (*int64, error) {
+func (i Float64ValueObject) ToInt64() (*int64, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *Float64ValueObject) ToFloat64() (*float64, error) {
-	return &i.val, nil
+func (i Float64ValueObject) ToFloat64() (*float64, error) {
+	return &i.Val, nil
 
 }
 
-func (i *Float64ValueObject) ToString() (*string, error) {
+func (i Float64ValueObject) ToString() (*string, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *Float64ValueObject) ToBoolean() (*bool, error) {
+func (i Float64ValueObject) ToBoolean() (*bool, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *Float64ValueObject) ToHashObject() (map[string]IValueObject, error) {
+func (i Float64ValueObject) ToHashObject() (map[string]IValueObject, error) {
 	return nil, re.CAST_ERROR
 }
 
@@ -91,27 +91,27 @@ type StringValueObject struct {
 	Val string
 }
 
-func (i *StringValueObject) Type() int {
+func (i StringValueObject) Type() int {
 	return VALUE_STRING
 }
 
-func (i *StringValueObject) ToInt64() (*int64, error) {
+func (i StringValueObject) ToInt64() (*int64, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *StringValueObject) ToFloat64() (*float64, error) {
+func (i StringValueObject) ToFloat64() (*float64, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *StringValueObject) ToString() (*string, error) {
+func (i StringValueObject) ToString() (*string, error) {
 	return &i.Val, nil
 }
 
-func (i *StringValueObject) ToBoolean() (*bool, error) {
+func (i StringValueObject) ToBoolean() (*bool, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *StringValueObject) ToHashObject() (map[string]IValueObject, error) {
+func (i StringValueObject) ToHashObject() (map[string]IValueObject, error) {
 	return nil, re.CAST_ERROR
 }
 
@@ -120,30 +120,30 @@ var _ IValueObject = (*StringValueObject)(nil)
 //
 
 type BooleanValueObject struct {
-	val bool
+	Val bool
 }
 
-func (i *BooleanValueObject) Type() int {
+func (i BooleanValueObject) Type() int {
 	return VALUE_BOOLEAN
 }
 
-func (i *BooleanValueObject) ToInt64() (*int64, error) {
+func (i BooleanValueObject) ToInt64() (*int64, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *BooleanValueObject) ToFloat64() (*float64, error) {
+func (i BooleanValueObject) ToFloat64() (*float64, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *BooleanValueObject) ToString() (*string, error) {
+func (i BooleanValueObject) ToString() (*string, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *BooleanValueObject) ToBoolean() (*bool, error) {
-	return &i.val, nil
+func (i BooleanValueObject) ToBoolean() (*bool, error) {
+	return &i.Val, nil
 }
 
-func (i *BooleanValueObject) ToHashObject() (map[string]IValueObject, error) {
+func (i BooleanValueObject) ToHashObject() (map[string]IValueObject, error) {
 	return nil, re.CAST_ERROR
 }
 
@@ -152,31 +152,31 @@ var _ IValueObject = (*BooleanValueObject)(nil)
 //
 
 type HashValueObject struct {
-	val map[string]IValueObject
+	Val map[string]IValueObject
 }
 
-func (i *HashValueObject) Type() int {
+func (i HashValueObject) Type() int {
 	return VALUE_HASH_OBJECT
 }
 
-func (i *HashValueObject) ToInt64() (*int64, error) {
+func (i HashValueObject) ToInt64() (*int64, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *HashValueObject) ToFloat64() (*float64, error) {
+func (i HashValueObject) ToFloat64() (*float64, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *HashValueObject) ToString() (*string, error) {
+func (i HashValueObject) ToString() (*string, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *HashValueObject) ToBoolean() (*bool, error) {
+func (i HashValueObject) ToBoolean() (*bool, error) {
 	return nil, re.CAST_ERROR
 }
 
-func (i *HashValueObject) ToHashObject() (map[string]IValueObject, error) {
-	return i.val, nil
+func (i HashValueObject) ToHashObject() (map[string]IValueObject, error) {
+	return i.Val, nil
 }
 
 var _ IValueObject = (*HashValueObject)(nil)
@@ -193,7 +193,7 @@ func ToValueObject(v parser.Value) (IValueObject, error) {
 			items[pair.Identifier.Identifier], _ = ToValueObject(pair.Value)
 		}
 
-		return &HashValueObject{val: items}, nil
+		return &HashValueObject{Val: items}, nil
 	}
 
 	if v.Literal != nil {
@@ -202,11 +202,11 @@ func ToValueObject(v parser.Value) (IValueObject, error) {
 		}
 
 		if v.Literal.Number != nil {
-			return &Float64ValueObject{val: *v.Literal.Number}, nil
+			return &Float64ValueObject{Val: *v.Literal.Number}, nil
 		}
 
 		if v.Literal.Boolean != nil {
-			return &BooleanValueObject{val: *v.Literal.Boolean == true}, nil
+			return &BooleanValueObject{Val: *v.Literal.Boolean == true}, nil
 		}
 
 		if v.Literal.Null {

@@ -46,6 +46,7 @@ func (ctx ScopedContext) GetTask(name *string) *task.Task {
 
 func (ctx ScopedContext) CreateScope(statements []parser.Statement) IContext {
 	return ScopedContext{
+		Phase:      ctx.Phase,
 		Statements: statements,
 		Variables:  ctx.Variables,
 		Tasks:      ctx.Tasks,
