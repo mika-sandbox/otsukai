@@ -1,7 +1,6 @@
 package runtime
 
 import (
-	"fmt"
 	"os/exec"
 	"otsukai"
 	"otsukai/parser"
@@ -72,7 +71,7 @@ func hasChangedInGitHistory(path string, revision string) (bool, error) {
 		return true, nil
 	}
 
-	return false, re.RUNTIME_ERROR
+	return false, nil
 }
 
 func InvokeChanged(ctx context.IContext, arguments []parser.Argument) (value.IValueObject, error) {
@@ -102,7 +101,6 @@ func InvokeChanged(ctx context.IContext, arguments []parser.Argument) (value.IVa
 	}
 
 	val, err := hasChangedInGitHistory(*path, commit)
-	fmt.Println(val)
 
 	return value.BooleanValueObject{Val: val}, nil
 }

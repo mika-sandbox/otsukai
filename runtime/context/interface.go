@@ -8,6 +8,7 @@ import (
 
 type IContext interface {
 	SetVar(name string, value value.IValueObject)
+	GetVar(name string) value.IValueObject
 	SetPhase(phase int)
 	GetPhase() int
 	GetContextFlag() int

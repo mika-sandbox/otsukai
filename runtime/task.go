@@ -10,7 +10,7 @@ import (
 	"otsukai/runtime/value"
 )
 
-func InvokeTask(ctx context.IContext, name *string) error {
+func InvokeTask(ctx *context.Context, name *string) error {
 	var err error
 
 	t := ctx.GetTask(name)
@@ -44,7 +44,7 @@ func InvokeTask(ctx context.IContext, name *string) error {
 	return nil
 }
 
-func CollectDeclarations(ctx context.Context) error {
+func CollectDeclarations(ctx *context.Context) error {
 	for _, statement := range ctx.GetStatements() {
 		s := statement.Statement
 
@@ -94,7 +94,7 @@ func CollectTask(ctx context.IContext, arguments []parser.Argument, lambda *pars
 		return nil, re.SYNTAX_ERROR
 	}
 
-	context, ok := ctx.(context.Context)
+	context, ok := ctx.(*context.Context)
 	if !ok {
 		return nil, errors.New("failed to cast context; context must be global")
 	}
@@ -127,7 +127,7 @@ func CollectHook(ctx context.IContext, arguments []parser.Argument, lambda *pars
 		return nil, re.SYNTAX_ERROR
 	}
 
-	context, ok := ctx.(context.Context)
+	context, ok := ctx.(*context.Context)
 	if !ok {
 		return nil, errors.New("failed to cast context; context must be global")
 	}

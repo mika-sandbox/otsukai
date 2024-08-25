@@ -14,27 +14,31 @@ type ScopedContext struct {
 	Phase      int
 }
 
-func (ctx ScopedContext) SetPhase(phase int) {
+func (ctx *ScopedContext) SetPhase(phase int) {
 	ctx.Phase = phase
 }
 
-func (ctx ScopedContext) GetPhase() int {
+func (ctx *ScopedContext) GetPhase() int {
 	return ctx.Phase
 }
 
-func (ctx ScopedContext) SetVar(name string, value value.IValueObject) {
+func (ctx *ScopedContext) SetVar(name string, value value.IValueObject) {
 	ctx.Variables[name] = value
 }
 
-func (ctx ScopedContext) GetContextFlag() int {
+func (ctx *ScopedContext) GetVar(name string) value.IValueObject {
+	return ctx.Variables[name]
+}
+
+func (ctx *ScopedContext) GetContextFlag() int {
 	return CONTEXT_GLOBAL | CONTEXT_TASK
 }
 
-func (ctx ScopedContext) GetStatements() []parser.Statement {
+func (ctx *ScopedContext) GetStatements() []parser.Statement {
 	return ctx.Statements
 }
 
-func (ctx ScopedContext) GetTask(name *string) *task.Task {
+func (ctx *ScopedContext) GetTask(name *string) *task.Task {
 	tasks := *ctx.Tasks
 	t, ok := tasks[*name]
 	if ok {
@@ -44,11 +48,14 @@ func (ctx ScopedContext) GetTask(name *string) *task.Task {
 	return nil
 }
 
-func (ctx ScopedContext) CreateScope(statements []parser.Statement) IContext {
-	return ScopedContext{
+
+func (ctx *ScopedContext) CreateScope(statements []parser.Statement) IContext {
+	return &ScopedContext{
 		Phase:      ctx.Phase,
 		Statements: statements,
 		Variables:  ctx.Variables,
 		Tasks:      ctx.Tasks,
+		Remote:     ctx.Remote,
+		Local:      ctx.Local,
 	}
 }

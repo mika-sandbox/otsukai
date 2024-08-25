@@ -15,27 +15,31 @@ type Context struct {
 	Phase      int
 }
 
-func (ctx Context) SetPhase(phase int) {
+func (ctx *Context) SetPhase(phase int) {
 	ctx.Phase = phase
 }
 
-func (ctx Context) GetPhase() int {
+func (ctx *Context) GetPhase() int {
 	return ctx.Phase
 }
 
-func (ctx Context) SetVar(name string, value value.IValueObject) {
+func (ctx *Context) SetVar(name string, value value.IValueObject) {
 	ctx.Variables[name] = value
 }
 
-func (ctx Context) GetContextFlag() int {
+func (ctx *Context) GetVar(name string) value.IValueObject {
+	return ctx.Variables[name]
+}
+
+func (ctx *Context) GetContextFlag() int {
 	return CONTEXT_GLOBAL | CONTEXT_COMPILATION
 }
 
-func (ctx Context) GetStatements() []parser.Statement {
+func (ctx *Context) GetStatements() []parser.Statement {
 	return ctx.Statements
 }
 
-func (ctx Context) GetTask(name *string) *task.Task {
+func (ctx *Context) GetTask(name *string) *task.Task {
 	t, ok := ctx.Tasks[*name]
 	if ok {
 		return &t
@@ -44,7 +48,7 @@ func (ctx Context) GetTask(name *string) *task.Task {
 	return nil
 }
 
-func (ctx Context) AddTask(name string, task task.Task) {
+func (ctx *Context) AddTask(name string, task task.Task) {
 	if _, exists := ctx.Tasks[name]; exists {
 		otsukai.Errf("the task '%s' is already declared", name)
 		return
@@ -53,12 +57,14 @@ func (ctx Context) AddTask(name string, task task.Task) {
 	ctx.Tasks[name] = task
 }
 
-func (ctx Context) CreateScope(statements []parser.Statement) IContext {
-	return ScopedContext{
+func (ctx *Context) CreateScope(statements []parser.Statement) IContext {
+	return &ScopedContext{
 		Phase:      ctx.Phase,
 		Statements: statements,
 		Variables:  ctx.Variables,
 		Tasks:      &ctx.Tasks,
+		Remote:     ctx.Remote,
+		Local:      ctx.Local,
 	}
 }
 

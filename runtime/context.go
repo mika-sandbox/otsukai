@@ -12,17 +12,17 @@ const PHASE_UNSET = 0
 const PHASE_COLLECT = 1
 const PHASE_RUN = 2
 
-func Run(ctx context.Context) error {
+func Run(ctx *context.Context) error {
 	var err error
 	// set default values
 	ctx.Variables["default"] = &value.StringValueObject{Val: "deploy"}
-	ctx.Phase = PHASE_COLLECT
+	ctx.SetPhase(PHASE_COLLECT)
 
 	if err = CollectDeclarations(ctx); err != nil {
 		return err
 	}
 
-	ctx.Phase = PHASE_RUN
+	ctx.SetPhase(PHASE_RUN)
 	defaultTaskNameVar := ctx.Variables["default"]
 	defaultTaskName, err := defaultTaskNameVar.ToString()
 	if err != nil {

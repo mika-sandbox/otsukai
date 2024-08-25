@@ -27,7 +27,7 @@ func run(c *cli.Context) error {
 	}
 
 	ctx := context.NewContext(ruby)
-	if err := runtime.Run(ctx); err != nil {
+	if err := runtime.Run(&ctx); err != nil {
 		log.Fatal(err)
 		return err
 	}
