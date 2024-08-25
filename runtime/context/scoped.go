@@ -2,6 +2,7 @@ package context
 
 import (
 	"otsukai/parser"
+	"otsukai/runtime/session"
 	"otsukai/runtime/task"
 	"otsukai/runtime/value"
 )
@@ -12,6 +13,8 @@ type ScopedContext struct {
 	Variables  map[string]value.IValueObject
 	Tasks      *map[string]task.Task
 	Phase      int
+	Remote     session.ISession
+	Local      session.ISession
 }
 
 func (ctx *ScopedContext) SetPhase(phase int) {
@@ -48,6 +51,18 @@ func (ctx *ScopedContext) GetTask(name *string) *task.Task {
 	return nil
 }
 
+func (ctx *ScopedContext) SetSession(remote session.ISession, local session.ISession) {
+	ctx.Remote = remote
+	ctx.Local = local
+}
+
+func (ctx *ScopedContext) GetRemoteSession() session.ISession {
+	return ctx.Remote
+}
+
+func (ctx *ScopedContext) GetLocalSession() session.ISession {
+	return ctx.Local
+}
 
 func (ctx *ScopedContext) CreateScope(statements []parser.Statement) IContext {
 	return &ScopedContext{

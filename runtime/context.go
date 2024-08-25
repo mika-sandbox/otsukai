@@ -127,7 +127,46 @@ func GetConditionResult(ctx context.IContext, condition parser.IfStatementOrExpr
 }
 
 func InvokeExpression(ctx context.IContext, expression *parser.ExpressionStatement) error {
-	return nil
+	var err error
+
+	expr := expression.Expression
+
+	// if
+	if expr.IfExpression != nil {
+		err = InvokeIfStatement(ctx.CreateScope(expr.IfExpression.Statements), expr.IfExpression.Condition)
+		if err != nil {
+			return err
+		}
+	}
+
+	// invocation
+	if expr.InvocationExpression != nil || expr.InvocationExpressionWithParen != nil {
+		var identifier string
+		var arguments []parser.Argument
+		var lambda *parser.LambdaExpression
+
+		if expr.InvocationExpression != nil {
+			identifier = expr.InvocationExpression.Expression.IdentifierNameExpression.Identifier.Name
+			arguments = expr.InvocationExpression.ArgumentList.Argument
+			lambda = expr.InvocationExpression.ArgumentList.LambdaExpression
+		}
+
+		if expr.InvocationExpressionWithParen != nil {
+			identifier = expr.InvocationExpressionWithParen.Expression.IdentifierNameExpression.Identifier.Name
+			arguments = expr.InvocationExpressionWithParen.ArgumentList.Argument
+			lambda = expr.InvocationExpressionWithParen.ArgumentList.LambdaExpression
+		}
+
+		_, err := InvokeFunction(ctx, identifier, arguments, lambda)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	otsukai.Errf("invalid context")
+	return re.RUNTIME_ERROR
 }
 
 func InvokeFunction(ctx context.IContext, identifier string, arguments []parser.Argument, lambda *parser.LambdaExpression) (value.IValueObject, error) {
@@ -143,6 +182,9 @@ func InvokeFunction(ctx context.IContext, identifier string, arguments []parser.
 
 	case "changed":
 		return InvokeChanged(ctx, arguments)
+
+	case "run":
+		return InvokeRun(ctx, arguments)
 	}
 
 	otsukai.Errf("the function `%v` is not declared in context", identifier)

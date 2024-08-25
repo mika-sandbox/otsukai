@@ -59,7 +59,7 @@ $ otsukai deploy --recipe examples/docker-compose/otsukai.rb --dry-run
 
 ## Functions
 
-### `set`
+### `set` (local func)
 
 Set a variable value. Example:
 
@@ -69,7 +69,7 @@ set default: :deploy
 set app_root: "/usr/local/"
 ```
 
-### `task`
+### `task` (local func)
 
 Define a task with name. Example:
 
@@ -85,7 +85,7 @@ task :rollback do
 end
 ```
 
-### `changed`
+### `changed` (local func)
 
 Check the specified path has changed from specified refs.
 
@@ -103,6 +103,31 @@ the `commit_from` supports the following args:
 the `commit_to` supports the following args:
 
 - Not Yet Implemented
+
+### `copy` (local / remote func)
+
+Copy file/directory between from local/remote to remote/local.
+
+```ruby
+copy(to: :remote, local: "/path/to/file", remote: "/path/to/dest")
+```
+
+the `to` supports the following args:
+
+- `:remote` : copy from local to remote
+- `:local`  : copy from remote to local
+
+the local and remote is path of the file or directory.
+if the directory is specified, copy recursively.
+
+### `run` (local / remote func)
+
+Run commands in local/remote.
+
+```ruby
+run(remote: "echo 'Hello, World'")
+run(local:  "echo 'Hello, World'")
+```
 
 ## License
 

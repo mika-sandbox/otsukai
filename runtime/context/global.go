@@ -3,6 +3,7 @@ package context
 import (
 	"otsukai"
 	"otsukai/parser"
+	"otsukai/runtime/session"
 	"otsukai/runtime/task"
 	"otsukai/runtime/value"
 )
@@ -13,6 +14,8 @@ type Context struct {
 	Variables  map[string]value.IValueObject
 	Tasks      map[string]task.Task
 	Phase      int
+	Remote     session.ISession
+	Local      session.ISession
 }
 
 func (ctx *Context) SetPhase(phase int) {
@@ -46,6 +49,19 @@ func (ctx *Context) GetTask(name *string) *task.Task {
 	}
 
 	return nil
+}
+
+func (ctx *Context) SetSession(remote session.ISession, local session.ISession) {
+	ctx.Remote = remote
+	ctx.Local = local
+}
+
+func (ctx *Context) GetRemoteSession() session.ISession {
+	return ctx.Remote
+}
+
+func (ctx *Context) GetLocalSession() session.ISession {
+	return ctx.Local
 }
 
 func (ctx *Context) AddTask(name string, task task.Task) {

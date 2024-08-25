@@ -6,6 +6,7 @@ import (
 	"otsukai/parser"
 	"otsukai/runtime/context"
 	re "otsukai/runtime/errors"
+	"otsukai/runtime/session"
 	"otsukai/runtime/task"
 	"otsukai/runtime/value"
 )
@@ -14,6 +15,23 @@ func InvokeTask(ctx *context.Context, name *string) error {
 	var err error
 
 	t := ctx.GetTask(name)
+	c := ctx.GetVar("remote")
+
+	remote, err := session.CreateRemoteSession(c)
+	if err != nil {
+		return err
+	}
+	defer remote.Close()
+
+	local, err := session.CreateLocalSession()
+	if err != nil {
+		return err
+	}
+
+	// ctx.Remote = remote
+	// ctx.Local = local
+	ctx.SetSession(remote, local)
+
 	if len(t.BeforeHooks) != 0 {
 		hooks := t.BeforeHooks
 

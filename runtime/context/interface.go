@@ -2,6 +2,7 @@ package context
 
 import (
 	"otsukai/parser"
+	"otsukai/runtime/session"
 	"otsukai/runtime/task"
 	"otsukai/runtime/value"
 )
@@ -15,4 +16,7 @@ type IContext interface {
 	GetStatements() []parser.Statement
 	GetTask(name *string) *task.Task
 	CreateScope(statements []parser.Statement) IContext
+	SetSession(remote session.ISession, local session.ISession)
+	GetRemoteSession() session.ISession
+	GetLocalSession() session.ISession
 }
