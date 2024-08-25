@@ -175,6 +175,7 @@ var RubyLikeLexer = lexer.MustSimple([]lexer.SimpleRule{
 var Parser = participle.MustBuild[Entry](
 	participle.Lexer(RubyLikeLexer),
 	participle.Elide("Comment", "Whitespace"),
+	participle.Unquote("String"),
 	participle.UseLookahead(2),
 )
 
