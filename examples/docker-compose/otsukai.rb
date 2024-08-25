@@ -1,8 +1,8 @@
 # default target host with user (ubuntu@yuuka.natsuneko.net)
-set target: { host: "yuuka.natsuneko.net", user: "ubuntu" }
+set remote: { host: "hifumi.natsuneko.net", user: "natsuneko" }
 
 task :deploy do
-  if changed "/path/to/docker-compose.yml", from: :last_commit
+  if changed path: "/path/to/docker-compose.yml", from: :last_commit
     # run as sudo
     run_as :sudo do
       # run docker compose down on remote

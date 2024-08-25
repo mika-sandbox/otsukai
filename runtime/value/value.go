@@ -3,6 +3,7 @@ package value
 import (
 	"otsukai/parser"
 	re "otsukai/runtime/errors"
+	"strconv"
 )
 
 const (
@@ -202,16 +203,26 @@ func ToValueObject(v parser.Value) (IValueObject, error) {
 		}
 
 		if v.Literal.Number != nil {
-			return &Float64ValueObject{Val: *v.Literal.Number}, nil
+			float, err := strconv.ParseFloat(*v.Literal.Number, 64)
+			if err != nil {
+				return nil, re.SYNTAX_ERROR
+			}
+
+			return &Float64ValueObject{Val: float}, nil
 		}
 
-		if v.Literal.Boolean != nil {
-			return &BooleanValueObject{Val: *v.Literal.Boolean == true}, nil
+		if v.Literal.True != nil {
+			return &BooleanValueObject{Val: true}, nil
 		}
 
-		if v.Literal.Null {
+		if v.Literal.False != nil {
+			return &BooleanValueObject{Val: false}, nil
+		}
+
+		if v.Literal.Null != nil {
 			return nil, nil
 		}
+
 	}
 
 	return nil, re.RUNTIME_ERROR

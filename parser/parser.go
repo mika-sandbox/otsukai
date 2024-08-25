@@ -19,10 +19,11 @@ type (
 	}
 
 	Literal struct {
-		String  *string  `parser:"@String  |"`
-		Number  *float64 `parser:"@Number  |"`
-		Boolean *bool    `parser:"('true' | 'false') |"`
-		Null    bool     `parser:"'nil'"`
+		String *string `parser:"@String |"`
+		Number *string `parser:"@Number |"`
+		True   *string `parser:"@True |"`
+		False  *string `parser:"@False |"`
+		Null   *string `parser:"@Null"`
 	}
 
 	HashIdentifier struct {
@@ -101,10 +102,10 @@ type (
 	Expression struct {
 		// MemberAccessExpression        *MemberAccessExpression        `parser:"@@ |"`
 		LambdaExpression              *LambdaExpression              `parser:"@@ |"`
+		ValueExpression               *ValueExpression               `parser:"@@ |"`
 		InvocationExpression          *InvocationExpression          `parser:"@@ |"`
 		InvocationExpressionWithParen *InvocationExpressionWithParen `parser:"@@ |"`
-		IfExpression                  *IfStatementOrExpression       `parser:"@@ |"`
-		ValueExpression               *ValueExpression               `parser:"@@"`
+		IfExpression                  *IfStatementOrExpression       `parser:"@@"`
 	}
 
 	BlockStatement struct {
@@ -154,6 +155,9 @@ type Entry struct {
 }
 
 var RubyLikeLexer = lexer.MustSimple([]lexer.SimpleRule{
+	{"True", "true"},
+	{"False", "false"},
+	{"Null", "nil"},
 	{"Identifier", `[A-Za-z_][A-Za-z0-9_]*`},
 	{"HashIdentifier", `[A-Za-z_][A-Za-z0-9_]+:`},
 	{"HashKeyword", `[A-Za-z0-9_]+`},
@@ -183,6 +187,9 @@ var Keywords = []string{
 	"do",
 	"if",
 	"end",
+	"true",
+	"false",
+	"nil",
 }
 
 func (v *Identifier) Parse(lex *lexer.PeekingLexer) error {
