@@ -85,6 +85,24 @@ task :rollback do
 end
 ```
 
+### `changed`
+
+Check the specified path has changed from specified refs.
+
+```ruby
+changed(path: "/path/to/file", commit_from: :last_commit, commit_to: :head) # returns bool
+```
+
+the `commit_from` supports the following args:
+
+- `:last_commit`  : the specified file is changed in last commit
+- `:fetch_commit` : the specified file is changed in remote fetched commit (ref: [`git-rev-parse#FETCH_HEAD`](https://git-scm.com/docs/git-rev-parse#Documentation/git-rev-parse.txt-codeFETCHHEADcode))  
+- `:before_merge` : the specified file is changed in before merged commit (ref: [`git-rev-parse#ORIG_HEAD`](https://git-scm.com/docs/git-rev-parse#Documentation/git-rev-parse.txt-codeORIGHEADcode))
+- `:after_merge`  : the specified file is changed in merged commit(s) (ref: [`git-rev-parse#MERGE_HEAD`](https://git-scm.com/docs/git-rev-parse#Documentation/git-rev-parse.txt-codeMERGEHEADcode))
+
+the `commit_to` supports the following args:
+
+- Not Yet Implemented
 
 ## License
 
