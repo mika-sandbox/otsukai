@@ -28,7 +28,7 @@ At the first time, you need to create a configuration file.
 set target: { host: "yuuka.natsuneko.net", user: "ubuntu" }
 
 task :deploy do
-  if changed("/path/to/docker-compose.yml", from: :last - commit)
+  if changed(path: "/path/to/docker-compose.yml", from: :last_commit)
     # run with sudo
     run_with :sudo do
       # run docker compose down on remote
