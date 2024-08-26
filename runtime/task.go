@@ -9,15 +9,32 @@ import (
 	"otsukai/runtime/session"
 	"otsukai/runtime/task"
 	"otsukai/runtime/value"
+	"time"
 )
+
+func getTimeout(ctx *context.Context) *time.Duration {
+	timeout := ctx.GetVar("timeout")
+	val, err := timeout.ToFloat64()
+
+	if err == nil {
+		return nil
+	}
+
+	seconds := time.Duration(int(*val)) * time.Second
+	return &seconds
+}
 
 func InvokeTask(ctx *context.Context, name *string) error {
 	var err error
 
 	t := ctx.GetTask(name)
 	c := ctx.GetVar("remote")
+	timeout := getTimeout(ctx)
 
-	remote, err := session.CreateRemoteSession(c)
+	remote, err := session.CreateRemoteSession(&session.CreateRemoteSessionOpts{
+		Remote:  c,
+		Timeout: timeout,
+	})
 	if err != nil {
 		return err
 	}

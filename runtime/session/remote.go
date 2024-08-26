@@ -6,12 +6,18 @@ import (
 	"golang.org/x/crypto/ssh"
 	"otsukai/runtime/value"
 	"strings"
+	"time"
 )
 
 type RemoteSession struct {
 	client  *ssh.Client
 	session *ssh.Session
 	stdout  bytes.Buffer
+}
+
+type CreateRemoteSessionOpts struct {
+	Remote  value.IValueObject
+	Timeout *time.Duration
 }
 
 func getUserName(remote value.IValueObject) (*string, error) {
@@ -48,20 +54,26 @@ func getRemoteHost(remote value.IValueObject) (*string, error) {
 	return &hostWithPort, nil
 }
 
-func CreateRemoteSession(remote value.IValueObject) (*RemoteSession, error) {
-	user, err := getUserName(remote)
+func CreateRemoteSession(opts *CreateRemoteSessionOpts) (*RemoteSession, error) {
+	user, err := getUserName(opts.Remote)
 	if err != nil {
 		return nil, err
 	}
 
-	host, err := getRemoteHost(remote)
+	host, err := getRemoteHost(opts.Remote)
 	if err != nil {
 		return nil, err
+	}
+
+	timeout := 10 * time.Second
+	if opts.Timeout != nil {
+		timeout = *opts.Timeout
 	}
 
 	cfg := &ssh.ClientConfig{
 		User:            *user,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		Timeout:         timeout,
 	}
 
 	client, err := ssh.Dial("tcp", *host, cfg)
