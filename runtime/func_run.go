@@ -19,7 +19,7 @@ func InvokeRun(ctx context.IContext, arguments []parser.Argument) (value.IValueO
 		val := stdout.Expression.ValueExpression
 		if val == nil || val.Value.Literal == nil {
 			otsukai.Errf("the argument of run must be boolean literal")
-			return nil, re.RUNTIME_ERROR
+			return nil, re.SYNTAX_ERROR
 		}
 
 		redirectToStdOut = val.Value.Literal.True != nil
@@ -34,7 +34,7 @@ func InvokeRun(ctx context.IContext, arguments []parser.Argument) (value.IValueO
 		val := remote.Expression.ValueExpression
 		if val == nil || val.Value.Literal == nil {
 			otsukai.Errf("the argument of run must be string literal")
-			return nil, re.RUNTIME_ERROR
+			return nil, re.SYNTAX_ERROR
 		}
 
 		command := val.Value.Literal.String
@@ -49,14 +49,15 @@ func InvokeRun(ctx context.IContext, arguments []parser.Argument) (value.IValueO
 		val := local.Expression.ValueExpression
 		if val == nil || val.Value.Literal == nil {
 			otsukai.Errf("the argument of run must be string literal")
-			return nil, re.RUNTIME_ERROR
+			return nil, re.SYNTAX_ERROR
 		}
 
 		command := val.Value.Literal.String
 		session := ctx.GetLocalSession()
 		err := session.Run(*command, redirectToStdOut)
 		if err != nil {
-			return nil, err
+			otsukai.Errf("failed to execute command: %s", err)
+			return nil, re.EXECUTION_ERROR
 		}
 	}
 

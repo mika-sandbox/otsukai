@@ -23,7 +23,7 @@ func getTargetCommit(arguments []parser.Argument) (string, error) {
 	}
 
 	if commit.Expression.ValueExpression == nil || commit.Expression.ValueExpression.Value.HashSymbol == nil {
-		return LAST_COMMIT, re.RUNTIME_ERROR
+		return LAST_COMMIT, re.SYNTAX_ERROR
 	}
 
 	symbol := commit.Expression.ValueExpression.Value.HashSymbol.Identifier
@@ -52,7 +52,7 @@ func getTargetFile(arguments []parser.Argument) (*string, error) {
 	}
 
 	if path.Expression.ValueExpression == nil || path.Expression.ValueExpression.Value.Literal == nil {
-		return nil, re.RUNTIME_ERROR
+		return nil, re.SYNTAX_ERROR
 	}
 
 	return path.Expression.ValueExpression.Value.Literal.String, nil

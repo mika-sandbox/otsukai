@@ -17,6 +17,7 @@ func Run(ctx *context.Context) error {
 	// set default values
 	ctx.Variables["default"] = &value.StringValueObject{Val: "deploy"}
 	ctx.SetPhase(PHASE_COLLECT)
+	ctx.SetLastStatus(context.CONTEXT_STATUS_PENDING)
 
 	if err = CollectDeclarations(ctx); err != nil {
 		return err
@@ -185,8 +186,11 @@ func InvokeFunction(ctx context.IContext, identifier string, arguments []parser.
 
 	case "run":
 		return InvokeRun(ctx, arguments)
+
+	case "task_success":
+		return InvokeTaskSuccess(ctx)
 	}
 
 	otsukai.Errf("the function `%v` is not declared in context", identifier)
-	return nil, re.RUNTIME_ERROR
+	return nil, re.EXECUTION_ERROR
 }

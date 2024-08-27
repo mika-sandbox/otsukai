@@ -1,14 +1,14 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 	"github.com/urfave/cli/v2"
-	"log"
 	"os"
 	"otsukai"
 	"otsukai/parser"
 	"otsukai/runtime"
 	"otsukai/runtime/context"
+	re "otsukai/runtime/errors"
 )
 
 func run(c *cli.Context) error {
@@ -16,19 +16,23 @@ func run(c *cli.Context) error {
 
 	content, err := os.ReadFile(recipe)
 	if err != nil {
-		log.Fatal(err)
-		return err
+		otsukai.Fatalf("failed to read recipe: %s", err)
+		return re.RUNTIME_ERROR
 	}
 
 	ruby, err := parser.Parser.ParseString("", string(content)+"\n")
 	if err != nil {
-		fmt.Println(err)
-		return err
+		otsukai.Errf("invalid syntax: %s", err)
+		return re.SYNTAX_ERROR
 	}
 
 	ctx := context.NewContext(ruby)
 	if err := runtime.Run(&ctx); err != nil {
-		log.Fatal(err)
+		if errors.Is(err, re.EXECUTION_ERROR) || errors.Is(err, re.SYNTAX_ERROR) || errors.Is(err, re.RUNTIME_ERROR) {
+			return err
+		}
+
+		otsukai.Fatalf("%s", err)
 		return err
 	}
 
@@ -88,6 +92,6 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		log.Fatal(err)
+		os.Exit(1)
 	}
 }

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"golang.org/x/crypto/ssh"
+	"otsukai"
+	re "otsukai/runtime/errors"
 	"otsukai/runtime/value"
 	"strings"
 	"time"
@@ -57,12 +59,14 @@ func getRemoteHost(remote value.IValueObject) (*string, error) {
 func CreateRemoteSession(opts *CreateRemoteSessionOpts) (*RemoteSession, error) {
 	user, err := getUserName(opts.Remote)
 	if err != nil {
-		return nil, err
+		otsukai.Errf("ssh error: username not found")
+		return nil, re.EXECUTION_ERROR
 	}
 
 	host, err := getRemoteHost(opts.Remote)
 	if err != nil {
-		return nil, err
+		otsukai.Errf("ssh error: remote host not found")
+		return nil, re.EXECUTION_ERROR
 	}
 
 	timeout := 10 * time.Second
@@ -78,12 +82,14 @@ func CreateRemoteSession(opts *CreateRemoteSessionOpts) (*RemoteSession, error) 
 
 	client, err := ssh.Dial("tcp", *host, cfg)
 	if err != nil {
-		return nil, err
+		otsukai.Errf("ssh error: %s", err)
+		return nil, re.EXECUTION_ERROR
 	}
 
 	session, err := client.NewSession()
 	if err != nil {
-		return nil, err
+		otsukai.Errf("ssh error: %s", err)
+		return nil, re.EXECUTION_ERROR
 	}
 
 	var stdout bytes.Buffer
@@ -99,12 +105,14 @@ func CreateRemoteSession(opts *CreateRemoteSessionOpts) (*RemoteSession, error) 
 func (session *RemoteSession) Run(command string, stdout bool) error {
 	ns, err := session.client.NewSession()
 	if err != nil {
-		return err
+		otsukai.Errf("ssh error: %s", err)
+		return re.EXECUTION_ERROR
 	}
 
 	ns.Stdout = &session.stdout
 	if err = ns.Run(command); err != nil {
-		return err
+		otsukai.Errf("failed to run command: %s", err)
+		return re.EXECUTION_ERROR
 	}
 
 	if stdout {

@@ -19,4 +19,6 @@ type IContext interface {
 	SetSession(remote session.ISession, local session.ISession)
 	GetRemoteSession() session.ISession
 	GetLocalSession() session.ISession
+	SetLastStatus(status int)
+	GetLastStatus() int
 }

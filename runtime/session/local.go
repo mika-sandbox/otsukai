@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/mattn/go-shellwords"
 	"os/exec"
+	"otsukai"
+	re "otsukai/runtime/errors"
 )
 
 type LocalSession struct{}
@@ -15,7 +17,8 @@ func CreateLocalSession() (*LocalSession, error) {
 func (session *LocalSession) Run(command string, stdout bool) error {
 	args, err := shellwords.Parse(command)
 	if err != nil {
-		return err
+		otsukai.Errf("failed to parse provided command: %s", err)
+		return re.EXECUTION_ERROR
 	}
 
 	var cmd *exec.Cmd
@@ -33,7 +36,8 @@ func (session *LocalSession) Run(command string, stdout bool) error {
 
 	out, err := cmd.Output()
 	if err != nil {
-		return err
+		otsukai.Errf("failed to execute command: %s", err)
+		return re.EXECUTION_ERROR
 	}
 
 	if stdout {

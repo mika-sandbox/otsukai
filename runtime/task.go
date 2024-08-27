@@ -45,8 +45,6 @@ func InvokeTask(ctx *context.Context, name *string) error {
 		return err
 	}
 
-	// ctx.Remote = remote
-	// ctx.Local = local
 	ctx.SetSession(remote, local)
 
 	if len(t.BeforeHooks) != 0 {
@@ -61,8 +59,10 @@ func InvokeTask(ctx *context.Context, name *string) error {
 	}
 
 	err = InvokeStatements(ctx.CreateScope(t.Statements))
-	if err != nil {
-		return err
+	if err == nil {
+		ctx.SetLastStatus(context.CONTEXT_STATUS_SUCCESS)
+	} else {
+		ctx.SetLastStatus(context.CONTEXT_STATUS_ERROR)
 	}
 
 	if len(t.AfterHooks) != 0 {
@@ -183,6 +183,6 @@ func CollectHook(ctx context.IContext, arguments []parser.Argument, lambda *pars
 		return nil, nil
 	}
 
-	otsukai.Errf("invalid hooks, hooks must be one of before or after")
+	otsukai.Errf("invalid hook, hook must be one of before or after")
 	return nil, re.RUNTIME_ERROR
 }

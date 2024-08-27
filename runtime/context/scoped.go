@@ -12,17 +12,18 @@ type ScopedContext struct {
 	Statements []parser.Statement
 	Variables  map[string]value.IValueObject
 	Tasks      *map[string]task.Task
-	Phase      int
-	Remote     session.ISession
-	Local      session.ISession
+	phase      int
+	remote     session.ISession
+	local      session.ISession
+	status     int
 }
 
 func (ctx *ScopedContext) SetPhase(phase int) {
-	ctx.Phase = phase
+	ctx.phase = phase
 }
 
 func (ctx *ScopedContext) GetPhase() int {
-	return ctx.Phase
+	return ctx.phase
 }
 
 func (ctx *ScopedContext) SetVar(name string, value value.IValueObject) {
@@ -52,25 +53,35 @@ func (ctx *ScopedContext) GetTask(name *string) *task.Task {
 }
 
 func (ctx *ScopedContext) SetSession(remote session.ISession, local session.ISession) {
-	ctx.Remote = remote
-	ctx.Local = local
+	ctx.remote = remote
+	ctx.local = local
 }
 
 func (ctx *ScopedContext) GetRemoteSession() session.ISession {
-	return ctx.Remote
+	return ctx.remote
 }
 
 func (ctx *ScopedContext) GetLocalSession() session.ISession {
-	return ctx.Local
+	return ctx.local
+}
+
+func (ctx *ScopedContext) SetLastStatus(status int) {
+	ctx.status = status
+}
+
+func (ctx *ScopedContext) GetLastStatus() int {
+	return ctx.status
 }
 
 func (ctx *ScopedContext) CreateScope(statements []parser.Statement) IContext {
 	return &ScopedContext{
-		Phase:      ctx.Phase,
+
 		Statements: statements,
 		Variables:  ctx.Variables,
 		Tasks:      ctx.Tasks,
-		Remote:     ctx.Remote,
-		Local:      ctx.Local,
+		phase:      ctx.phase,
+		remote:     ctx.remote,
+		local:      ctx.local,
+		status:     ctx.GetLastStatus(),
 	}
 }
