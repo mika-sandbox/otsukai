@@ -1,4 +1,4 @@
-name: Testing - Go
+name: Testing - E2E (examples/ls)
 
 on:
   pull_request:
