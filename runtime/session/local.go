@@ -27,7 +27,7 @@ func (session *LocalSession) Run(command string, stdout bool) error {
 		cmd = exec.Command(args[0])
 		break
 
-	case 2:
+	default:
 		cmd = exec.Command(args[0], args[1:]...)
 	}
 
