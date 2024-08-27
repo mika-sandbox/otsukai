@@ -46,7 +46,18 @@ func InvokeRun(ctx context.IContext, arguments []parser.Argument) (value.IValueO
 	}
 
 	if local != nil {
+		val := local.Expression.ValueExpression
+		if val == nil || val.Value.Literal == nil {
+			otsukai.Errf("the argument of run must be string literal")
+			return nil, re.RUNTIME_ERROR
+		}
 
+		command := val.Value.Literal.String
+		session := ctx.GetLocalSession()
+		err := session.Run(*command, redirectToStdOut)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return nil, nil

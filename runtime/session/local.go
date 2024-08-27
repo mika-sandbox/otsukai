@@ -1,6 +1,10 @@
 package session
 
-import "os/exec"
+import (
+	"fmt"
+	"github.com/mattn/go-shellwords"
+	"os/exec"
+)
 
 type LocalSession struct{}
 
@@ -9,8 +13,34 @@ func CreateLocalSession() (*LocalSession, error) {
 }
 
 func (session *LocalSession) Run(command string, stdout bool) error {
-	cmd := exec.Command(command)
-	return cmd.Run()
+	args, err := shellwords.Parse(command)
+	if err != nil {
+		return err
+	}
+
+	var cmd *exec.Cmd
+	switch len(args) {
+	case 0:
+		return nil
+
+	case 1:
+		cmd = exec.Command(args[0])
+		break
+
+	case 2:
+		cmd = exec.Command(args[0], args[1:]...)
+	}
+
+	out, err := cmd.Output()
+	if err != nil {
+		return err
+	}
+
+	if stdout {
+		fmt.Println(string(out))
+	}
+
+	return nil
 }
 
 func (session *LocalSession) Close() {

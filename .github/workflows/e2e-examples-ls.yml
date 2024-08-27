@@ -38,6 +38,10 @@ jobs:
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:github-actions-restricted
 
-      - name: Run Recipe
+      - name: Run Recipe (for Remote)
         run: |
-          otsukai run --recipe examples/ls/otsukai.rb | grep k3s-install.sh
+          otsukai run --recipe examples/ls-remote/otsukai.rb | grep k3s-install.sh
+
+      - name: Run Recipe (for Local)
+        run: |
+          otsukai run --recipe examples/ls-local/otsukai.rb
