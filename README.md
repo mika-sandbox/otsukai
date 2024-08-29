@@ -51,10 +51,10 @@ Then, you can deploy your application by running the following command.
 $ otsukai test --recipe examples/docker-compose/otsukai.rb
 
 # deploy
-$ otsukai deploy --recipe examples/docker-compose/otsukai.rb
+$ otsukai run --recipe examples/docker-compose/otsukai.rb
 
 # deploy (dry-run)
-$ otsukai deploy --recipe examples/docker-compose/otsukai.rb --dry-run
+$ otsukai run --recipe examples/docker-compose/otsukai.rb --dry-run
 ```
 
 ## Functions
@@ -75,12 +75,12 @@ Define a task with name. Example:
 
 ```ruby
 # define `deploy` task
-task :deploy do 
+task :deploy do
   # ...
 end
 
 # define `rollback` task
-task :rollback do 
+task :rollback do
   # ...
 end
 ```
@@ -95,10 +95,10 @@ changed(path: "/path/to/file", commit_from: :last_commit, commit_to: :head) # re
 
 the `commit_from` supports the following args:
 
-- `:last_commit`  : the specified file is changed in last commit
-- `:fetch_commit` : the specified file is changed in remote fetched commit (ref: [`git-rev-parse#FETCH_HEAD`](https://git-scm.com/docs/git-rev-parse#Documentation/git-rev-parse.txt-codeFETCHHEADcode))  
+- `:last_commit` : the specified file is changed in last commit
+- `:fetch_commit` : the specified file is changed in remote fetched commit (ref: [`git-rev-parse#FETCH_HEAD`](https://git-scm.com/docs/git-rev-parse#Documentation/git-rev-parse.txt-codeFETCHHEADcode))
 - `:before_merge` : the specified file is changed in before merged commit (ref: [`git-rev-parse#ORIG_HEAD`](https://git-scm.com/docs/git-rev-parse#Documentation/git-rev-parse.txt-codeORIGHEADcode))
-- `:after_merge`  : the specified file is changed in merged commit(s) (ref: [`git-rev-parse#MERGE_HEAD`](https://git-scm.com/docs/git-rev-parse#Documentation/git-rev-parse.txt-codeMERGEHEADcode))
+- `:after_merge` : the specified file is changed in merged commit(s) (ref: [`git-rev-parse#MERGE_HEAD`](https://git-scm.com/docs/git-rev-parse#Documentation/git-rev-parse.txt-codeMERGEHEADcode))
 
 the `commit_to` supports the following args:
 
@@ -115,7 +115,7 @@ copy(to: :remote, local: "/path/to/file", remote: "/path/to/dest")
 the `to` supports the following args:
 
 - `:remote` : copy from local to remote
-- `:local`  : copy from remote to local
+- `:local` : copy from remote to local
 
 the local and remote is path of the file or directory.
 if the directory is specified, copy recursively.
@@ -134,7 +134,7 @@ run(local:  "echo 'Hello, World'")
 Return `true` when the last task is successful.
 
 ```ruby
-task :deploy do 
+task :deploy do
   # ...
 end
 
