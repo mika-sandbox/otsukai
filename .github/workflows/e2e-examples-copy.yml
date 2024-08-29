@@ -46,7 +46,7 @@ jobs:
       - name: Run Recipe (for Local)
         run: |
           mkdir -p ~/.ssh/
-          ssh-keyscan -H $(tailscale ip --4 hifumi.natsuneko.net)  >> ~/.ssh/known_hosts 
+          ssh-keyscan -$(tailscale ip --4 hifumi.natsuneko.net)  >> ~/.ssh/known_hosts 
           ssh hifumi.natsuneko.net "rm /home/natsuneko/otsukai.rb"
 
           otsukai run --recipe examples/copy-to-remote/otsukai.rb
