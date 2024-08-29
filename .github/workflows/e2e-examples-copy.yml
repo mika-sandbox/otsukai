@@ -1,0 +1,54 @@
+name: Testing - E2E (examples/ls)
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ["1.22.x"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+
+          # You can test your matrix by printing the current Go version
+      - name: Display Go version
+        run: go version
+
+      - name: Build
+        run: go install ./cmd/otsukai.go
+
+      - name: Setup Tailnet
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:github-actions-restricted
+
+      - name: Run Recipe (for Remote)
+        run: |
+          otsukai run --recipe examples/copy-to-local/otsukai.rb
+          ls -al ./examples/copy-to-local/ | grep k3s-install.sh
+
+      - name: Run Recipe (for Local)
+        run: |
+          mkdir -p ~/.ssh/
+          ssh-keyscan -H $(tailscale ip --4 hifumi.natsuneko.net)  >> ~/.ssh/known_hosts 
+          ssh hifumi.natsuneko.net "rm /home/natsuneko/otsukai.rb"
+
+          otsukai run --recipe examples/copy-to-remote/otsukai.rb
+
+          ssh hifumi.natsuneko.net "ls -al" | grep otsukai.rb
