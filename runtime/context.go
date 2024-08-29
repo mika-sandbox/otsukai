@@ -187,6 +187,9 @@ func InvokeFunction(ctx context.IContext, identifier string, arguments []parser.
 	case "run":
 		return InvokeRun(ctx, arguments)
 
+	case "copy":
+		return InvokeCopy(ctx, arguments)
+
 	case "task_success":
 		return InvokeTaskSuccess(ctx)
 	}

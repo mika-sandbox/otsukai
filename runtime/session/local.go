@@ -47,6 +47,14 @@ func (session *LocalSession) Run(command string, stdout bool) error {
 	return nil
 }
 
+func (session *LocalSession) CopyToRemote(local string, remote string) error {
+	return nil
+}
+
+func (session *LocalSession) CopyToLocal(local string, remote string, isDir bool) error {
+	return nil
+}
+
 func (session *LocalSession) Close() {
 	// NOTHING TO DO
 }

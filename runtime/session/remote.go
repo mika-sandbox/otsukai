@@ -2,8 +2,11 @@ package session
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	"github.com/povsister/scp"
 	"golang.org/x/crypto/ssh"
+	"os"
 	"otsukai"
 	re "otsukai/runtime/errors"
 	"otsukai/runtime/value"
@@ -120,6 +123,90 @@ func (session *RemoteSession) Run(command string, stdout bool) error {
 	}
 
 	return nil
+}
+
+func (session *RemoteSession) CopyToRemote(local string, remote string) error {
+	client, err := scp.NewClientFromExistingSSH(session.client, &scp.ClientOption{})
+	if err != nil {
+		otsukai.Errf("ssh error: %s", err)
+		return re.EXECUTION_ERROR
+	}
+
+	defer client.Close()
+
+	stat, err := os.Stat(local)
+	if err == nil {
+		if stat.IsDir() {
+			// copy recursively
+			err = client.CopyDirToRemote(local, remote, &scp.DirTransferOption{
+				Context:      context.Background(),
+				PreserveProp: true,
+			})
+			if err != nil {
+				otsukai.Errf("ssh error: %s", err)
+				return re.EXECUTION_ERROR
+			}
+
+			return nil
+		} else {
+			// copy file
+			err = client.CopyFileToRemote(local, remote, &scp.FileTransferOption{
+				Context:      context.Background(),
+				PreserveProp: true,
+			})
+			if err != nil {
+				otsukai.Errf("ssh error: %s", err)
+				return re.EXECUTION_ERROR
+			}
+
+			return nil
+		}
+	}
+
+	if os.IsNotExist(err) {
+		otsukai.Errf("local path not found: %s", err)
+		return re.EXECUTION_ERROR
+	}
+
+	otsukai.Errf("unknown error")
+	return re.EXECUTION_ERROR
+
+}
+
+func (session *RemoteSession) CopyToLocal(local string, remote string, isDir bool) error {
+	client, err := scp.NewClientFromExistingSSH(session.client, &scp.ClientOption{})
+	if err != nil {
+		otsukai.Errf("ssh error: %s", err)
+		return re.EXECUTION_ERROR
+	}
+
+	defer client.Close()
+
+	if isDir {
+		// copy recursively
+		err = client.CopyDirFromRemote(remote, local, &scp.DirTransferOption{
+			Context:      context.Background(),
+			PreserveProp: true,
+		})
+		if err != nil {
+			otsukai.Errf("ssh error: %s", err)
+			return re.EXECUTION_ERROR
+		}
+
+		return nil
+	} else {
+		// copy file
+		err = client.CopyFileFromRemote(remote, local, &scp.FileTransferOption{
+			Context:      context.Background(),
+			PreserveProp: true,
+		})
+		if err != nil {
+			otsukai.Errf("ssh error: %s", err)
+			return re.EXECUTION_ERROR
+		}
+
+		return nil
+	}
 }
 
 func (session *RemoteSession) Close() {
