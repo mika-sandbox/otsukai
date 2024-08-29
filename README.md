@@ -129,6 +129,22 @@ run(remote: "echo 'Hello, World'")
 run(local:  "echo 'Hello, World'")
 ```
 
+### `task_success` (local func)
+
+Return `true` when the last task is successful.
+
+```ruby
+task :deploy do 
+  # ...
+end
+
+hook after: :deploy do
+  if task_success
+    run # ...
+  end
+end
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
