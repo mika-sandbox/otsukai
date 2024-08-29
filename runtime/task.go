@@ -14,9 +14,12 @@ import (
 
 func getTimeout(ctx *context.Context) *time.Duration {
 	timeout := ctx.GetVar("timeout")
-	val, err := timeout.ToFloat64()
+	if timeout == nil {
+		return nil
+	}
 
-	if err == nil {
+	val, err := timeout.ToFloat64()
+	if err != nil {
 		return nil
 	}
 
