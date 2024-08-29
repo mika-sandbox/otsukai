@@ -110,6 +110,7 @@ Copy file/directory between from local/remote to remote/local.
 
 ```ruby
 copy(to: :remote, local: "/path/to/file", remote: "/path/to/dest")
+copy(to: :local, remote: "/path/to/file", local: "/path/to/dest", is_dir: true)
 ```
 
 the `to` supports the following args:
@@ -119,6 +120,8 @@ the `to` supports the following args:
 
 the local and remote is path of the file or directory.
 if the directory is specified, copy recursively.
+
+the `is_dir` is required for `to: :local`, and default is `false`.
 
 ### `run` (local / remote func)
 
