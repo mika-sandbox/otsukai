@@ -1,4 +1,4 @@
-name: Testing - E2E (examples/ls)
+name: Testing - E2E (examples/copy)
 
 on:
   pull_request:
@@ -46,9 +46,13 @@ jobs:
       - name: Run Recipe (for Local)
         run: |
           mkdir -p ~/.ssh/
-          ssh-keyscan -$(tailscale ip --4 hifumi.natsuneko.net)  >> ~/.ssh/known_hosts 
-          ssh hifumi.natsuneko.net "rm /home/natsuneko/otsukai.rb"
+          ssh-keyscan $(tailscale ip --4 hifumi.natsuneko.net)  >> ~/.ssh/known_hosts
+          
+          echo 'Host *' >> ~/.ssh/config
+          echo '  StrictHostKeyChecking no' >> ~/.ssh/config
+          
+          ssh natsuneko@hifumi.natsuneko.net "rm /home/natsuneko/otsukai.rb" || true
 
           otsukai run --recipe examples/copy-to-remote/otsukai.rb
 
-          ssh hifumi.natsuneko.net "ls -al" | grep otsukai.rb
+          ssh natsuneko@hifumi.natsuneko.net "ls -al" | grep otsukai.rb
