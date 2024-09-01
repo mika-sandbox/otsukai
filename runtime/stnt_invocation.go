@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/logger"
 	"github.com/mika-sandbox/otsukai/parser"
 	"github.com/mika-sandbox/otsukai/runtime/context"
 	re "github.com/mika-sandbox/otsukai/runtime/errors"
@@ -32,6 +32,6 @@ func InvokeFunction(ctx context.IContext, identifier string, arguments []parser.
 		return InvokeTaskSuccess(ctx)
 	}
 
-	otsukai.Errf("the function `%v` is not declared in context", identifier)
+	logger.Errf("the function `%v` is not declared in context", identifier)
 	return nil, re.EXECUTION_ERROR
 }

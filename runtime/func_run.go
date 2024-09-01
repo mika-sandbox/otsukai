@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/logger"
 	"github.com/mika-sandbox/otsukai/parser"
 	"github.com/mika-sandbox/otsukai/runtime/context"
 	re "github.com/mika-sandbox/otsukai/runtime/errors"
@@ -18,7 +18,7 @@ func InvokeRun(ctx context.IContext, arguments []parser.Argument) (value.IValueO
 	if stdout != nil {
 		val := stdout.Expression.ValueExpression
 		if val == nil || val.Value.Literal == nil {
-			otsukai.Errf("the argument of run must be boolean literal")
+			logger.Errf("the argument of run must be boolean literal")
 			return nil, re.SYNTAX_ERROR
 		}
 
@@ -26,14 +26,14 @@ func InvokeRun(ctx context.IContext, arguments []parser.Argument) (value.IValueO
 	}
 
 	if remote != nil && local != nil {
-		otsukai.Errf("invalid argument: could not specify both of remote and local")
+		logger.Errf("invalid argument: could not specify both of remote and local")
 		return nil, re.RUNTIME_ERROR
 	}
 
 	if remote != nil {
 		val := remote.Expression.ValueExpression
 		if val == nil || val.Value.Literal == nil {
-			otsukai.Errf("the argument of run must be string literal")
+			logger.Errf("the argument of run must be string literal")
 			return nil, re.SYNTAX_ERROR
 		}
 
@@ -48,7 +48,7 @@ func InvokeRun(ctx context.IContext, arguments []parser.Argument) (value.IValueO
 	if local != nil {
 		val := local.Expression.ValueExpression
 		if val == nil || val.Value.Literal == nil {
-			otsukai.Errf("the argument of run must be string literal")
+			logger.Errf("the argument of run must be string literal")
 			return nil, re.SYNTAX_ERROR
 		}
 
@@ -56,7 +56,7 @@ func InvokeRun(ctx context.IContext, arguments []parser.Argument) (value.IValueO
 		session := ctx.GetLocalSession()
 		err := session.Run(*command, redirectToStdOut)
 		if err != nil {
-			otsukai.Errf("failed to execute command: %s", err)
+			logger.Errf("failed to execute command: %s", err)
 			return nil, re.EXECUTION_ERROR
 		}
 	}

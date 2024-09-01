@@ -2,7 +2,7 @@ package runtime
 
 import (
 	"errors"
-	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/logger"
 	"github.com/mika-sandbox/otsukai/parser"
 	"github.com/mika-sandbox/otsukai/runtime/context"
 	re "github.com/mika-sandbox/otsukai/runtime/errors"
@@ -87,13 +87,13 @@ func CollectDeclarations(ctx *context.Context) error {
 		s := statement.Statement
 
 		if s.IfStatement != nil || s.BlockStatement != nil {
-			otsukai.Errf("invalid statement: if or block statement could not placed in the compilation block")
+			logger.Errf("invalid statement: if or block statement could not placed in the compilation block")
 			return errors.New("invalid statement: if or block statement could not placed in the compilation block")
 		}
 
 		expression := s.ExpressionStatement.Expression
 		if expression.IfExpression != nil || expression.ValueExpression != nil || expression.LambdaExpression != nil {
-			otsukai.Errf("invalid statement: if expression, lambda expression or value.go could not placed in the compilation block")
+			logger.Errf("invalid statement: if expression, lambda expression or value.go could not placed in the compilation block")
 			return errors.New("invalid statement: if expression, lambda expression or value.go could not placed in the compilation block")
 		}
 
@@ -117,18 +117,18 @@ func CollectTask(ctx context.IContext, arguments []parser.Argument, lambda *pars
 
 	scope := ctx.GetContextFlag()
 	if scope&context.CONTEXT_COMPILATION != context.CONTEXT_COMPILATION {
-		otsukai.Errf("invalid context")
+		logger.Errf("invalid context")
 		return nil, re.SYNTAX_ERROR
 	}
 
 	if len(arguments) != 1 {
-		otsukai.Errf("task method must have one argument, with lambda")
+		logger.Errf("task method must have one argument, with lambda")
 		return nil, re.SYNTAX_ERROR
 	}
 
 	name := arguments[0].Expression.ValueExpression.Value.HashSymbol
 	if name == nil {
-		otsukai.Errf("the first argument of task must be symbol")
+		logger.Errf("the first argument of task must be symbol")
 		return nil, re.SYNTAX_ERROR
 	}
 
@@ -150,18 +150,18 @@ func CollectHook(ctx context.IContext, arguments []parser.Argument, lambda *pars
 
 	scope := ctx.GetContextFlag()
 	if scope&context.CONTEXT_COMPILATION != context.CONTEXT_COMPILATION {
-		otsukai.Errf("invalid context")
+		logger.Errf("invalid context")
 		return nil, re.SYNTAX_ERROR
 	}
 
 	if len(arguments) != 1 {
-		otsukai.Errf("task method must have one argument, with lambda")
+		logger.Errf("task method must have one argument, with lambda")
 		return nil, re.SYNTAX_ERROR
 	}
 
 	name := arguments[0].Expression.ValueExpression.Value.HashSymbol
 	if name == nil {
-		otsukai.Errf("the first argument of task must be symbol")
+		logger.Errf("the first argument of task must be symbol")
 		return nil, re.SYNTAX_ERROR
 	}
 
@@ -186,6 +186,6 @@ func CollectHook(ctx context.IContext, arguments []parser.Argument, lambda *pars
 		return nil, nil
 	}
 
-	otsukai.Errf("invalid hook, hook must be one of before or after")
+	logger.Errf("invalid hook, hook must be one of before or after")
 	return nil, re.RUNTIME_ERROR
 }

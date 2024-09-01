@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/logger"
 	"github.com/mika-sandbox/otsukai/parser"
 	"github.com/mika-sandbox/otsukai/runtime"
 	"github.com/mika-sandbox/otsukai/runtime/context"
@@ -16,13 +16,13 @@ func run(c *cli.Context) error {
 
 	content, err := os.ReadFile(recipe)
 	if err != nil {
-		otsukai.Fatalf("failed to read recipe: %s", err)
+		logger.Fatalf("failed to read recipe: %s", err)
 		return re.RUNTIME_ERROR
 	}
 
 	ruby, err := parser.Parser.ParseString("", string(content)+"\n")
 	if err != nil {
-		otsukai.Errf("invalid syntax: %s", err)
+		logger.Errf("invalid syntax: %s", err)
 		return re.SYNTAX_ERROR
 	}
 
@@ -32,7 +32,7 @@ func run(c *cli.Context) error {
 			return err
 		}
 
-		otsukai.Fatalf("%s", err)
+		logger.Fatalf("%s", err)
 		return err
 	}
 
@@ -41,21 +41,21 @@ func run(c *cli.Context) error {
 
 func test(c *cli.Context) error {
 	recipe := c.String("recipe")
-	otsukai.Infof("check syntax for %s", recipe)
+	logger.Infof("check syntax for %s", recipe)
 
 	content, err := os.ReadFile(recipe)
 	if err != nil {
-		otsukai.Fatalf("failed to read recipe: %s", err.Error())
+		logger.Fatalf("failed to read recipe: %s", err.Error())
 		return err
 	}
 
 	_, err = parser.Parser.ParseString("", string(content)+"\n")
 	if err != nil {
-		otsukai.Errf("check syntas for %s is failed: %s", recipe, err.Error())
+		logger.Errf("check syntas for %s is failed: %s", recipe, err.Error())
 		return err
 	}
 
-	otsukai.Successf("check syntax for %s is success", recipe)
+	logger.Successf("check syntax for %s is success", recipe)
 	return nil
 }
 

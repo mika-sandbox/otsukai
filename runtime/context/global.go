@@ -1,7 +1,7 @@
 package context
 
 import (
-	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/logger"
 	"github.com/mika-sandbox/otsukai/parser"
 	"github.com/mika-sandbox/otsukai/runtime/session"
 	"github.com/mika-sandbox/otsukai/runtime/task"
@@ -67,7 +67,7 @@ func (ctx *Context) GetLocalSession() session.ISession {
 
 func (ctx *Context) AddTask(name string, task task.Task) {
 	if _, exists := ctx.Tasks[name]; exists {
-		otsukai.Errf("the task '%s' is already declared", name)
+		logger.Errf("the task '%s' is already declared", name)
 		return
 	}
 

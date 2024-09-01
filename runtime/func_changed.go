@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/logger"
 	"github.com/mika-sandbox/otsukai/parser"
 	"github.com/mika-sandbox/otsukai/runtime/context"
 	re "github.com/mika-sandbox/otsukai/runtime/errors"
@@ -82,11 +82,11 @@ func InvokeChanged(ctx context.IContext, arguments []parser.Argument) (value.IVa
 
 	scope := ctx.GetContextFlag()
 	if scope&context.CONTEXT_TASK != context.CONTEXT_TASK {
-		otsukai.Errf("invalid context")
+		logger.Errf("invalid context")
 		return nil, re.SYNTAX_ERROR
 	}
 	if len(arguments) != 2 {
-		otsukai.Errf("set method must be one argument")
+		logger.Errf("set method must be one argument")
 		return nil, re.SYNTAX_ERROR
 	}
 

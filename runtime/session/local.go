@@ -3,7 +3,7 @@ package session
 import (
 	"fmt"
 	"github.com/mattn/go-shellwords"
-	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/logger"
 	re "github.com/mika-sandbox/otsukai/runtime/errors"
 	"os/exec"
 )
@@ -17,7 +17,7 @@ func CreateLocalSession() (*LocalSession, error) {
 func (session *LocalSession) Run(command string, stdout bool) error {
 	args, err := shellwords.Parse(command)
 	if err != nil {
-		otsukai.Errf("failed to parse provided command: %s", err)
+		logger.Errf("failed to parse provided command: %s", err)
 		return re.EXECUTION_ERROR
 	}
 
@@ -36,7 +36,7 @@ func (session *LocalSession) Run(command string, stdout bool) error {
 
 	out, err := cmd.Output()
 	if err != nil {
-		otsukai.Errf("failed to execute command: %s", err)
+		logger.Errf("failed to execute command: %s", err)
 		return re.EXECUTION_ERROR
 	}
 

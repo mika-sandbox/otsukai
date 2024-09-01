@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/logger"
 	re "github.com/mika-sandbox/otsukai/runtime/errors"
 	"github.com/mika-sandbox/otsukai/runtime/value"
 	"github.com/povsister/scp"
@@ -62,13 +62,13 @@ func getRemoteHost(remote value.IValueObject) (*string, error) {
 func CreateRemoteSession(opts *CreateRemoteSessionOpts) (*RemoteSession, error) {
 	user, err := getUserName(opts.Remote)
 	if err != nil {
-		otsukai.Errf("ssh error: username not found")
+		logger.Errf("ssh error: username not found")
 		return nil, re.EXECUTION_ERROR
 	}
 
 	host, err := getRemoteHost(opts.Remote)
 	if err != nil {
-		otsukai.Errf("ssh error: remote host not found")
+		logger.Errf("ssh error: remote host not found")
 		return nil, re.EXECUTION_ERROR
 	}
 
@@ -85,13 +85,13 @@ func CreateRemoteSession(opts *CreateRemoteSessionOpts) (*RemoteSession, error) 
 
 	client, err := ssh.Dial("tcp", *host, cfg)
 	if err != nil {
-		otsukai.Errf("ssh error: %s", err)
+		logger.Errf("ssh error: %s", err)
 		return nil, re.EXECUTION_ERROR
 	}
 
 	session, err := client.NewSession()
 	if err != nil {
-		otsukai.Errf("ssh error: %s", err)
+		logger.Errf("ssh error: %s", err)
 		return nil, re.EXECUTION_ERROR
 	}
 
@@ -108,13 +108,13 @@ func CreateRemoteSession(opts *CreateRemoteSessionOpts) (*RemoteSession, error) 
 func (session *RemoteSession) Run(command string, stdout bool) error {
 	ns, err := session.client.NewSession()
 	if err != nil {
-		otsukai.Errf("ssh error: %s", err)
+		logger.Errf("ssh error: %s", err)
 		return re.EXECUTION_ERROR
 	}
 
 	ns.Stdout = &session.stdout
 	if err = ns.Run(command); err != nil {
-		otsukai.Errf("failed to run command: %s", err)
+		logger.Errf("failed to run command: %s", err)
 		return re.EXECUTION_ERROR
 	}
 
@@ -128,7 +128,7 @@ func (session *RemoteSession) Run(command string, stdout bool) error {
 func (session *RemoteSession) CopyToRemote(local string, remote string) error {
 	client, err := scp.NewClientFromExistingSSH(session.client, &scp.ClientOption{})
 	if err != nil {
-		otsukai.Errf("ssh error: %s", err)
+		logger.Errf("ssh error: %s", err)
 		return re.EXECUTION_ERROR
 	}
 
@@ -143,7 +143,7 @@ func (session *RemoteSession) CopyToRemote(local string, remote string) error {
 				PreserveProp: true,
 			})
 			if err != nil {
-				otsukai.Errf("ssh error: %s", err)
+				logger.Errf("ssh error: %s", err)
 				return re.EXECUTION_ERROR
 			}
 
@@ -155,7 +155,7 @@ func (session *RemoteSession) CopyToRemote(local string, remote string) error {
 				PreserveProp: true,
 			})
 			if err != nil {
-				otsukai.Errf("ssh error: %s", err)
+				logger.Errf("ssh error: %s", err)
 				return re.EXECUTION_ERROR
 			}
 
@@ -164,11 +164,11 @@ func (session *RemoteSession) CopyToRemote(local string, remote string) error {
 	}
 
 	if os.IsNotExist(err) {
-		otsukai.Errf("local path not found: %s", err)
+		logger.Errf("local path not found: %s", err)
 		return re.EXECUTION_ERROR
 	}
 
-	otsukai.Errf("unknown error")
+	logger.Errf("unknown error")
 	return re.EXECUTION_ERROR
 
 }
@@ -176,7 +176,7 @@ func (session *RemoteSession) CopyToRemote(local string, remote string) error {
 func (session *RemoteSession) CopyToLocal(local string, remote string, isDir bool) error {
 	client, err := scp.NewClientFromExistingSSH(session.client, &scp.ClientOption{})
 	if err != nil {
-		otsukai.Errf("ssh error: %s", err)
+		logger.Errf("ssh error: %s", err)
 		return re.EXECUTION_ERROR
 	}
 
@@ -189,7 +189,7 @@ func (session *RemoteSession) CopyToLocal(local string, remote string, isDir boo
 			PreserveProp: true,
 		})
 		if err != nil {
-			otsukai.Errf("ssh error: %s", err)
+			logger.Errf("ssh error: %s", err)
 			return re.EXECUTION_ERROR
 		}
 
@@ -201,7 +201,7 @@ func (session *RemoteSession) CopyToLocal(local string, remote string, isDir boo
 			PreserveProp: true,
 		})
 		if err != nil {
-			otsukai.Errf("ssh error: %s", err)
+			logger.Errf("ssh error: %s", err)
 			return re.EXECUTION_ERROR
 		}
 

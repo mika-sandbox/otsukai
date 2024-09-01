@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/logger"
 	"github.com/mika-sandbox/otsukai/parser"
 	"github.com/mika-sandbox/otsukai/runtime/context"
 	re "github.com/mika-sandbox/otsukai/runtime/errors"
@@ -12,19 +12,19 @@ import (
 func InvokeCopy(ctx context.IContext, arguments []parser.Argument) (value.IValueObject, error) {
 	remote := helpers.GetStringLiteral(helpers.GetNamedArgument(arguments, "remote"))
 	if remote == nil {
-		otsukai.Errf("remote named argument must be required")
+		logger.Errf("remote named argument must be required")
 		return nil, re.RUNTIME_ERROR
 	}
 
 	local := helpers.GetStringLiteral(helpers.GetNamedArgument(arguments, "local"))
 	if local == nil {
-		otsukai.Errf("local named argument must be required")
+		logger.Errf("local named argument must be required")
 		return nil, re.RUNTIME_ERROR
 	}
 
 	to := helpers.GetSymbol(helpers.GetNamedArgument(arguments, "to"))
 	if to == nil {
-		otsukai.Errf("to named argument must be required")
+		logger.Errf("to named argument must be required")
 		return nil, re.RUNTIME_ERROR
 	}
 

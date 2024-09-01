@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/logger"
 	"github.com/mika-sandbox/otsukai/parser"
 	"github.com/mika-sandbox/otsukai/runtime/context"
 	re "github.com/mika-sandbox/otsukai/runtime/errors"
@@ -46,6 +46,6 @@ func InvokeExpression(ctx context.IContext, expression *parser.ExpressionStateme
 		return nil
 	}
 
-	otsukai.Errf("invalid context")
+	logger.Errf("invalid context")
 	return re.RUNTIME_ERROR
 }

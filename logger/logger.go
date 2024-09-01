@@ -1,4 +1,4 @@
-package otsukai
+package logger
 
 import (
 	"fmt"
