@@ -3,7 +3,6 @@ package parser
 import (
 	require "github.com/alecthomas/assert/v2"
 	"os"
-	"otsukai/runtime"
 	"testing"
 )
 
@@ -15,12 +14,12 @@ func c(t *testing.T, path string) string {
 }
 
 func TestExample_DockerCompose(t *testing.T) {
-	content := c(t, "./examples/docker-compose/otsukai.rb")
+	content := c(t, "../examples/docker-compose/otsukai.rb")
 	ret, err := Parser.ParseString("", content)
 	require.NoError(t, err)
-	require.Equal(t, 4, len(ret.Statements))
+	require.Equal(t, 3, len(ret.Statements))
 
-	// set default: :deploy
+	// set target: { host: "yuuka.natsuneko.net", user: "ubuntu" }
 	{
 		invocation := ret.Statements[0].Statement.ExpressionStatement.Expression.InvocationExpression
 		require.Equal(t, "set", invocation.Expression.IdentifierNameExpression.Identifier.Name)
@@ -32,36 +31,22 @@ func TestExample_DockerCompose(t *testing.T) {
 
 		arg := args[0]
 		key := *arg.Identifier
-		value := arg.Expression.ValueExpression.Value.HashSymbol
-		require.Equal(t, "default", key)
-		require.Equal(t, "deploy", value.Identifier)
-	}
+		object := arg.Expression.ValueExpression.Value.Hash.Pairs
+		require.Equal(t, "remote", key)
 
-	// set target: { host: "yuuka.natsuneko.net", user: "ubuntu" }
-	{
-		invocation := ret.Statements[1].Statement.ExpressionStatement.Expression.InvocationExpression
-		require.Equal(t, "set", invocation.Expression.IdentifierNameExpression.Identifier.Name)
+		{
+			identifier := object[0].Identifier
+			value := object[0].Value.Literal.String
 
-		args := invocation.ArgumentList.Argument
-		lambda := invocation.ArgumentList.LambdaExpression
-		require.Equal(t, nil, lambda)
-		require.Equal(t, 1, len(args))
+			require.Equal(t, "host", identifier.Identifier)
+			require.Equal(t, "hifumi.natsuneko.net", *value)
 
-		arg := args[0]
-		key := *arg.Identifier
-		value, _ := runtime.ToValueObject(arg.Expression.ValueExpression.Value)
-		require.Equal(t, "target", key)
-
-		object, _ := value.ToHashObject()
-		host, _ := object["host"].ToString()
-		user, _ := object["user"].ToString()
-		require.Equal(t, "\"yuuka.natsuneko.net\"", *host)
-		require.Equal(t, "\"ubuntu\"", *user)
+		}
 	}
 
 	// task :deploy do ... end
 	{
-		invocation := ret.Statements[2].Statement.ExpressionStatement.Expression.InvocationExpression
+		invocation := ret.Statements[1].Statement.ExpressionStatement.Expression.InvocationExpression
 		require.Equal(t, "task", invocation.Expression.IdentifierNameExpression.Identifier.Name)
 
 		args := invocation.ArgumentList.Argument
@@ -86,7 +71,7 @@ func TestExample_DockerCompose(t *testing.T) {
 			require.Equal(t, 2, len(args))
 
 			a := args[0]
-			require.Equal(t, "\"/path/to/docker-compose.yml\"", *a.Expression.ValueExpression.Value.Literal.String)
+			require.Equal(t, "/path/to/docker-compose.yml", *a.Expression.ValueExpression.Value.Literal.String)
 
 			b := args[1]
 			require.Equal(t, "from", *b.Identifier)
@@ -121,7 +106,7 @@ func TestExample_DockerCompose(t *testing.T) {
 
 	// hook after: :deploy do ... end
 	{
-		invocation := ret.Statements[3].Statement.ExpressionStatement.Expression.InvocationExpression
+		invocation := ret.Statements[2].Statement.ExpressionStatement.Expression.InvocationExpression
 		require.Equal(t, "hook", invocation.Expression.IdentifierNameExpression.Identifier.Name)
 
 		args := invocation.ArgumentList.Argument

@@ -1,8 +1,8 @@
 package value
 
 import (
-	"otsukai/parser"
-	re "otsukai/runtime/errors"
+	"github.com/mika-sandbox/otsukai/parser"
+	re "github.com/mika-sandbox/otsukai/runtime/errors"
 	"strconv"
 )
 

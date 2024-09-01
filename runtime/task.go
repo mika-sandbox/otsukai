@@ -2,13 +2,13 @@ package runtime
 
 import (
 	"errors"
-	"otsukai"
-	"otsukai/parser"
-	"otsukai/runtime/context"
-	re "otsukai/runtime/errors"
-	"otsukai/runtime/session"
-	"otsukai/runtime/task"
-	"otsukai/runtime/value"
+	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/parser"
+	"github.com/mika-sandbox/otsukai/runtime/context"
+	re "github.com/mika-sandbox/otsukai/runtime/errors"
+	"github.com/mika-sandbox/otsukai/runtime/session"
+	"github.com/mika-sandbox/otsukai/runtime/task"
+	"github.com/mika-sandbox/otsukai/runtime/value"
 	"time"
 )
 

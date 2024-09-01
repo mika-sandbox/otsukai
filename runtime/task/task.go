@@ -1,6 +1,6 @@
 package task
 
-import "otsukai/parser"
+import "github.com/mika-sandbox/otsukai/parser"
 
 type Task struct {
 	Name        string

@@ -3,9 +3,9 @@ package session
 import (
 	"fmt"
 	"github.com/mattn/go-shellwords"
+	"github.com/mika-sandbox/otsukai"
+	re "github.com/mika-sandbox/otsukai/runtime/errors"
 	"os/exec"
-	"otsukai"
-	re "otsukai/runtime/errors"
 )
 
 type LocalSession struct{}

@@ -1,9 +1,9 @@
 package runtime
 
 import (
-	"otsukai/runtime/context"
-	re "otsukai/runtime/errors"
-	"otsukai/runtime/value"
+	"github.com/mika-sandbox/otsukai/runtime/context"
+	re "github.com/mika-sandbox/otsukai/runtime/errors"
+	"github.com/mika-sandbox/otsukai/runtime/value"
 )
 
 func InvokeTaskSuccess(ctx context.IContext) (value.IValueObject, error) {

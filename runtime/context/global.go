@@ -1,11 +1,11 @@
 package context
 
 import (
-	"otsukai"
-	"otsukai/parser"
-	"otsukai/runtime/session"
-	"otsukai/runtime/task"
-	"otsukai/runtime/value"
+	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/parser"
+	"github.com/mika-sandbox/otsukai/runtime/session"
+	"github.com/mika-sandbox/otsukai/runtime/task"
+	"github.com/mika-sandbox/otsukai/runtime/value"
 )
 
 // Context is global context, use for global variable declarations

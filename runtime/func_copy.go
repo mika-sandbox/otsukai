@@ -1,12 +1,12 @@
 package runtime
 
 import (
-	"otsukai"
-	"otsukai/parser"
-	"otsukai/runtime/context"
-	re "otsukai/runtime/errors"
-	"otsukai/runtime/helpers"
-	"otsukai/runtime/value"
+	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/parser"
+	"github.com/mika-sandbox/otsukai/runtime/context"
+	re "github.com/mika-sandbox/otsukai/runtime/errors"
+	"github.com/mika-sandbox/otsukai/runtime/helpers"
+	"github.com/mika-sandbox/otsukai/runtime/value"
 )
 
 func InvokeCopy(ctx context.IContext, arguments []parser.Argument) (value.IValueObject, error) {

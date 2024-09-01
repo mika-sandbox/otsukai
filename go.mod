@@ -1,4 +1,4 @@
-module otsukai
+module github.com/mika-sandbox/otsukai
 
 go 1.22
 

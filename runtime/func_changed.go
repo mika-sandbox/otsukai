@@ -1,13 +1,13 @@
 package runtime
 
 import (
+	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/parser"
+	"github.com/mika-sandbox/otsukai/runtime/context"
+	re "github.com/mika-sandbox/otsukai/runtime/errors"
+	"github.com/mika-sandbox/otsukai/runtime/helpers"
+	"github.com/mika-sandbox/otsukai/runtime/value"
 	"os/exec"
-	"otsukai"
-	"otsukai/parser"
-	"otsukai/runtime/context"
-	re "otsukai/runtime/errors"
-	"otsukai/runtime/helpers"
-	"otsukai/runtime/value"
 )
 
 // https://git-scm.com/docs/git-rev-parse#Documentation/git-rev-parse.txt-codeHEADcode

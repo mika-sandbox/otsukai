@@ -2,13 +2,13 @@ package main
 
 import (
 	"errors"
+	"github.com/mika-sandbox/otsukai"
+	"github.com/mika-sandbox/otsukai/parser"
+	"github.com/mika-sandbox/otsukai/runtime"
+	"github.com/mika-sandbox/otsukai/runtime/context"
+	re "github.com/mika-sandbox/otsukai/runtime/errors"
 	"github.com/urfave/cli/v2"
 	"os"
-	"otsukai"
-	"otsukai/parser"
-	"otsukai/runtime"
-	"otsukai/runtime/context"
-	re "otsukai/runtime/errors"
 )
 
 func run(c *cli.Context) error {

@@ -1,7 +1,7 @@
 package helpers
 
 import (
-	"otsukai/parser"
+	"github.com/mika-sandbox/otsukai/parser"
 )
 
 func GetNamedArgument(arguments []parser.Argument, name string) *parser.Argument {

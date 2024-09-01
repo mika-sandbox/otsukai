@@ -1,10 +1,10 @@
 package context
 
 import (
-	"otsukai/parser"
-	"otsukai/runtime/session"
-	"otsukai/runtime/task"
-	"otsukai/runtime/value"
+	"github.com/mika-sandbox/otsukai/parser"
+	"github.com/mika-sandbox/otsukai/runtime/session"
+	"github.com/mika-sandbox/otsukai/runtime/task"
+	"github.com/mika-sandbox/otsukai/runtime/value"
 )
 
 // ScopedContext is scoped context, use for in-task variable declarations
