@@ -132,7 +132,10 @@ func (session *RemoteSession) CopyToRemote(local string, remote string) error {
 		return re.EXECUTION_ERROR
 	}
 
-	defer client.Close()
+	_, err = client.NewSession()
+	if err != nil {
+		logger.Errf("ssh error: %s", err)
+	}
 
 	stat, err := os.Stat(local)
 	if err == nil {
@@ -178,6 +181,11 @@ func (session *RemoteSession) CopyToLocal(local string, remote string, isDir boo
 	if err != nil {
 		logger.Errf("ssh error: %s", err)
 		return re.EXECUTION_ERROR
+	}
+
+	_, err = client.NewSession()
+	if err != nil {
+		logger.Errf("ssh error: %s", err)
 	}
 
 	defer client.Close()
