@@ -18,6 +18,7 @@ type RemoteSession struct {
 	client  *ssh.Client
 	session *ssh.Session
 	stdout  bytes.Buffer
+	stderr  bytes.Buffer
 }
 
 type CreateRemoteSessionOpts struct {
@@ -98,10 +99,14 @@ func CreateRemoteSession(opts *CreateRemoteSessionOpts) (*RemoteSession, error) 
 	var stdout bytes.Buffer
 	session.Stdout = &stdout
 
+	var stderr bytes.Buffer
+	session.Stderr = &stderr
+
 	return &RemoteSession{
 		client,
 		session,
 		stdout,
+		stderr,
 	}, nil
 }
 
@@ -113,14 +118,21 @@ func (session *RemoteSession) Run(command string, stdout bool) error {
 	}
 
 	ns.Stdout = &session.stdout
+	ns.Stderr = &session.stderr
+
 	if err = ns.Run(command); err != nil {
 		logger.Errf("failed to run command: %s", err)
 		return re.EXECUTION_ERROR
 	}
 
+	fmt.Println(session.stderr.String())
+
 	if stdout {
 		fmt.Println(session.stdout.String())
 	}
+
+	session.stderr.Reset()
+	session.stdout.Reset()
 
 	return nil
 }
