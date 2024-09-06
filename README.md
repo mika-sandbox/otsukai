@@ -64,10 +64,15 @@ $ otsukai run --recipe examples/docker-compose/otsukai.rb --dry-run
 Set a variable value. Example:
 
 ```ruby
-set target: { host: "yuuka.natsuneko.net", user: "ubuntu" }
+set remote: { host: "yuuka.natsuneko.net", user: "ubuntu" }
 set default: :deploy
 set app_root: "/usr/local/"
 ```
+
+The following variables are specialized:
+
+- `remote: { host: string, user: string }`
+- `timeout: number` (default: `10`)
 
 ### `task` (local func)
 

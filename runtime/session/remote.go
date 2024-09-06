@@ -1,6 +1,7 @@
 package session
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"fmt"
@@ -117,22 +118,30 @@ func (session *RemoteSession) Run(command string, stdout bool) error {
 		return re.EXECUTION_ERROR
 	}
 
-	ns.Stdout = &session.stdout
-	ns.Stderr = &session.stderr
+	stdoutPipe, err := ns.StdoutPipe()
+	stderrPipe, err := ns.StderrPipe()
 
 	if err = ns.Run(command); err != nil {
 		logger.Errf("failed to run command: %s", err)
 		return re.EXECUTION_ERROR
 	}
-
-	fmt.Println(session.stderr.String())
-
 	if stdout {
-		fmt.Println(session.stdout.String())
-	}
+		go func() {
+			scanner := bufio.NewScanner(stdoutPipe)
+			for scanner.Scan() {
+				line := scanner.Text()
+				fmt.Printf("stdout: %s\n", line)
+			}
+		}()
 
-	session.stderr.Reset()
-	session.stdout.Reset()
+		go func() {
+			scanner := bufio.NewScanner(stderrPipe)
+			for scanner.Scan() {
+				line := scanner.Text()
+				fmt.Printf("stderr: %s\n", line)
+			}
+		}()
+	}
 
 	return nil
 }
